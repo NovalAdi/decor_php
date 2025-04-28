@@ -1,0 +1,23 @@
+.active-drop {
+    display: flex;
+    text-align: left;
+}
+.inactive-drop {
+    display: none;
+}
+.active-burder {
+    display: flex;
+    text-align: left;
+}
+.inactive-burger {
+    display: none;
+}
+
+.active-nav {
+    text-decoration: underline;
+    text-underline-offset: 5px;
+}
+
+.footer {
+    text-align: left;
+}

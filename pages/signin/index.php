@@ -1,3 +1,28 @@
+<?php
+include "../../config.php";
+
+if (isset($_POST['btnSubmit'])) {
+    $username = $_POST['username'];
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+
+    $phash = password_hash($password, PASSWORD_DEFAULT);
+
+    $sql = "INSERT INTO `user` (`id`, `username`, `email`, `password`) VALUES (NULL, '$username', '$email', '$phash');";
+    
+    $query = mysqli_query($conn, $sql);
+
+    if ($query) {
+        header("Location: ../signup/");
+    } else {
+        echo "Registration failed!";
+    }
+    mysqli_close($conn);
+}
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -10,25 +35,25 @@
 
 <body class=" h-[100vh] w-[100vw] bg-[#F0E7E1]">
     <div class="flex justify-evenly items-center h-full">
-        <form action="/home" class="w-[30vw] flex flex-col gap-10">
-            <img src="logo-decor[1].svg" alt="" width="200px">
+        <form method="post" class="w-[30vw] flex flex-col gap-10"> 
+            <img src="../../img/logo-decor.svg" alt="" width="200px">
             <div>
                 <div class="flex flex-col gap-2">
                     <label>Username</label>
-                    <input type="text" placeholder="Username"
+                    <input type="text" name="username" placeholder="Username"
                         class="p-2 border border-[1.5px] border-gray-400 rounded-lg">
                 </div>
                 <div class="flex flex-col mt-4 gap-2">
                     <label>Email</label>
-                    <input type="email" placeholder="email@gmail.com"
+                    <input type="email" name="email" placeholder="email@gmail.com"
                         class="p-2 border border-[1.5px] border-gray-400 rounded-lg">
                 </div>
                 <div class="flex flex-col mt-4 gap-2">
                     <label>Password</label>
                     <div class="flex flex-col relative ">
-                        <input id="input" type="password" placeholder="Password"
+                        <input id="input" name="password" type="password" placeholder="Password"
                             class="p-2 border border-[1.5px] border-gray-400 rounded-lg">
-                        <a id="eye" class="h-full absolute right-3 flex items-center"><img id="eye-img" src="hide.png"
+                        <a id="eye" class="h-full absolute right-3 flex items-center"><img id="eye-img" src="../../img/hide.png"
                                 alt="" width="25px"></a>
 
                     </div>
@@ -37,11 +62,11 @@
 
             <div class="flex flex-col gap-2">
                 <a href="" class="text-gray-600">Forget Password?</a>
-                <button type="submit" class="w-full text-white py-2 rounded-lg bg-[#B5733A]">Sign Up</button>
-                <p class="self-center">or <a href="signIn.html" class="text-[#B5733A]">Sign In</a></p>
+                <input name="btnSubmit" type="submit" class="w-full text-white py-2 rounded-lg bg-[#B5733A]" value="Sign In">
+                <p class="self-center">or <a href="signin.php" class="text-[#B5733A]">Forgot ? </a></p>
             </div>
         </form>
-        <img src="Group_15[1].svg" alt="" width="430px">
+        <img src="../../img/Group_15.svg" alt="" width="430px">
     </div>
 
     <script src="script.js"></script>
