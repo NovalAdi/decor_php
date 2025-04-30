@@ -1,6 +1,15 @@
 <?php
 
-$routes = [
+$routes = $_SESSION['role'] == 'admin' ? [
+    [
+        'name' => 'Dashboard',
+        'path' => '../admin/',
+    ],
+    [
+        'name' => 'Products',
+        'path' => '../admin/products/',
+    ],
+] : [
     [
         'name' => 'Home',
         'path' => '../home/',
@@ -16,10 +25,6 @@ $routes = [
     [
         'name' => 'Categories',
         'path' => '../categories/',
-    ],
-    [
-        'name' => 'Blog',
-        'path' => '../blog/',
     ],
     [
         'name' => 'Contact',

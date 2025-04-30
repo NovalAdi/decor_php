@@ -1,5 +1,6 @@
 <?php
 include "../../config.php";
+session_start();
 ?>
 
 <!DOCTYPE html>
@@ -41,7 +42,7 @@ include "../../config.php";
                 The Best Choice for a Home That Feels Like You
             </h1>
             <article class="text-sm sm:text-base md:text-base text-gray-700">
-            From sleek minimalism to cozy accents, we offer solutions that turn houses into homes. Because great design should be effortless.
+                From sleek minimalism to cozy accents, we offer solutions that turn houses into homes. Because great design should be effortless.
             </article>
             <button class="rounded py-2 px-4 sm:px-6 bg-[#B5733A] text-white hover:bg-[#9a5e2e] transition-all">
                 Explore Our Shop
@@ -65,48 +66,34 @@ include "../../config.php";
     <!-- why us -->
     <section class="bg-[#F0E7E1] flex justify-center w-full py-10 mt-24">
         <section
-            class="flex-col min-[1030px]:flex-row flex gap-20 items-center justify-center max-[1025px]:w-[80%] w-[70%]">
-            <img class="max-[1030px]:hidden" src="<?= IMG_PATH ?>Group_15.svg" alt="">
-            <div class="flex flex-col gap-5">
-                <div class="flex gap-10">
-                    <img class="w-[300px] max-[500px]:hidden min-[1025px]:hidden" src="<?= IMG_PATH ?>Group_15.svg" alt="">
-                    <div class="flex flex-col gap-10 justify-center">
-                        <h1 class="text-3xl sm:text-5xl font-medium text-[#B5733A]">Why Us?</h1>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. In, temporibus magnam cum sunt ipsa
-                            facilis
-                            neque autem dolorum dolorem, adipisci aperiam ipsam deserunt eaque nesciunt voluptatem
-                            libero
-                            incidunt
-                            et beatae.</p>
+            class="flex-col lg:flex-row flex gap-16 items-center justify-center w-[90%] lg:w-[80%]">
+            <img class="hidden lg:block w-[300px] lg:w-[350px]" src="<?= IMG_PATH ?>Group_15.svg" alt="">
+            <div class="flex flex-col gap-6">
+                <div class="flex gap-8">
+                    <img class="block lg:hidden w-[200px] lg:w-[250px]" src="<?= IMG_PATH ?>Group_15.svg" alt="">
+                    <div class="flex flex-col gap-6">
+                        <h1 class="text-2xl sm:text-4xl font-medium text-[#B5733A]">Why Us?</h1>
+                        <p class="text-sm sm:text-base text-gray-700">Lorem ipsum dolor sit amet consectetur adipisicing elit. In, temporibus magnam cum sunt ipsa facilis neque autem dolorum dolorem, adipisci aperiam ipsam deserunt eaque nesciunt voluptatem libero incidunt et beatae.</p>
                     </div>
                 </div>
                 <div>
-                    <h1 class="font-bold text-lg sm:text-xl">Designer Art</h1>
-                    <p class="ml-3 mt-3">There are many variations of passages of lorem ipsum available, but the
-                        majority
-                        have suffered
-                        alteration in some form.</p>
+                    <h1 class="font-bold text-base sm:text-lg">Designer Art</h1>
+                    <p class="ml-3 mt-2 text-sm sm:text-base text-gray-700">There are many variations of passages of lorem ipsum available, but the majority have suffered alteration in some form.</p>
                 </div>
                 <div>
-                    <h1 class="font-bold text-lg sm:text-xl">High Quality</h1>
-                    <p class="ml-3 mt-3">There are many variations of passages of lorem ipsum available, but the
-                        majority
-                        have suffered
-                        alteration in some form.</p>
+                    <h1 class="font-bold text-base sm:text-lg">High Quality</h1>
+                    <p class="ml-3 mt-2 text-sm sm:text-base text-gray-700">There are many variations of passages of lorem ipsum available, but the majority have suffered alteration in some form.</p>
                 </div>
                 <div>
-                    <h1 class="font-bold text-lg sm:text-xl">Branded Product</h1>
-                    <p class="ml-3 mt-3">There are many variations of passages of lorem ipsum available, but the
-                        majority
-                        have suffered
-                        alteration in some form.</p>
+                    <h1 class="font-bold text-base sm:text-lg">Branded Product</h1>
+                    <p class="ml-3 mt-2 text-sm sm:text-base text-gray-700">There are many variations of passages of lorem ipsum available, but the majority have suffered alteration in some form.</p>
                 </div>
             </div>
         </section>
     </section>
 
     <!-- stats -->
-    <section class="flex w-full items-streach justify-evenly mt-24">
+    <section class="flex w-full items-stretch justify-evenly mt-24">
         <div class="flex flex-col gap-2 h-[150px] w-[250px] justify-center items-center">
             <h1 class="text-3xl sm:text-5xl font-medium text-[#B5733A]">50+</h1>
             <p class="sm:text-xl">Designer</p>
@@ -175,54 +162,9 @@ include "../../config.php";
         </div>
     </section>
 
-    <!-- Contact -->
-    <section class="bg-[#F0E7E1] flex justify-center">
-        <div class="flex flex-col sm:flex-row gap-10 w-[80%] py-28 justify-between">
-            <div class="flex flex-col gap-3">
-                <h1 class="text-[#B5733A] text-xl font-medium mb-1">Contact Us</h1>
-                <div class="flex gap-2">
-                    <i class="fa-solid fa-location-dot"></i>
-                    <p>Address: London Oxford Street, 012 United Kingdom.</p>
-                </div>
-                <div class="flex gap-2">
-                    <i class="fa-solid fa-phone"></i>
-                    <p>Phone : (+032) 3456 7890</p>
-                </div>
-                <div class="flex gap-2">
-                    <i class="fa-solid fa-envelope"></i>
-                    <p>decor@gmail.com</p>
-                </div>
-                <div class="flex gap-3">
-                    <p>Follow us on : </p>
-                    <a href=""><i class="fa-brands fa-instagram text-lg"></i></a>
-                    <a href=""><i class="fa-brands fa-x-twitter text-lg"></i></a>
-                    <a href=""><i class="fa-brands fa-facebook text-lg"></i></a>
-                </div>
-            </div>
-            <div class="flex flex-col gap-2">
-                <h1 class="text-[#B5733A] text-xl font-medium mb-2">Information</h1>
-                <a href="">New Product</a>
-                <a href="">Top Seller</a>
-                <a href="">Our Blog</a>
-                <a href="">About Our Shop</a>
-                <a href="">Privacy Policy</a>
-            </div>
-            <div class="flex flex-col gap-2">
-                <h1 class="text-[#B5733A] text-xl font-medium mb-2">Account</h1>
-                <a href="">My Account</a>
-                <a href="">Discount</a>
-                <a href="">Orders History</a>
-                <a href="">Personal Information</a>
-            </div>
-        </div>
-    </section>
+    <?php include "../../components/footer.php" ?>
 
-    <!-- footer -->
-    <footer class="text-white bg-[#B5733A] py-5 flex justify-center items-center">
-        Coppyright 2024 by Decor
-    </footer>
-
-    <script src="./script.js"></script>
+    <script src="script.js"></script>
 </body>
 
 </html>
