@@ -8,7 +8,7 @@ if (isset($_POST['btnSubmit'])) {
 
     $phash = password_hash($password, PASSWORD_DEFAULT);
 
-    $sql = "INSERT INTO `user` (`id`, `username`, `email`, `password`) VALUES (NULL, '$username', '$email', '$phash');";
+    $sql = "INSERT INTO `user` (`id`, `username`, `email`, `password`, `role`) VALUES (NULL, '$username', '$email', '$phash', 'customer');";
     
     $query = mysqli_query($conn, $sql);
 
@@ -69,7 +69,6 @@ if (isset($_POST['btnSubmit'])) {
         <img src="../../img/Group_15.svg" alt="" width="430px">
     </div>
 
-    <script src="script.js"></script>
 </body>
 
 </html>

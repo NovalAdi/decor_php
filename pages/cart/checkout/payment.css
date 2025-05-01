@@ -1,0 +1,175 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    display: flex;
+    gap: 20px;
+}
+
+.left-section, .right-section {
+    flex: 1;
+}
+
+.section {
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.address {
+    background-color: #f5f9ff;
+    padding: 15px;
+    border-radius: 6px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.address .details {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.store {
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 15px;
+}
+
+.store .store-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.product {
+    display: flex;
+    align-items: flex-start;
+}
+
+.product img {
+    width: 60px;
+    height: auto;
+    margin-right: 10px;
+    border-radius: 4px;
+}
+
+.product-details {
+    font-size: 14px;
+}
+.details button {
+    background-color: bisque;
+}
+
+.price {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.shipping {
+    margin-top: 15px;
+    font-size: 14px;
+    gap: 20px;
+}
+
+.shipping input {
+    margin-right: 5px;
+    gap: 10px;
+    font-weight: 300;
+}
+
+.note {
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+.note textarea {
+    width: 100%;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 14px;
+    resize: none;
+}
+
+.line {
+    margin: 10px;
+}
+
+.payment-method {
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 15px;
+}
+
+.payment-method label {
+    display: flex;
+    margin-bottom: 10px;
+    align-items: center;
+    gap: 10px;
+}
+
+.payment-method label img {
+    height: 50px;
+    width: 50px;
+    object-fit: cover;
+}
+
+.summary {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 6px;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.summary-total {
+    font-weight: bold;
+}
+
+.btn-ganti {
+    padding: 0 10px;
+    border: 1px solid gray;
+    border-radius: 5px;
+}
+
+
+
+
+.active-kategori {
+    display: flex;
+}
+.inactive-kategori {
+    display: none;
+}
+.active-burder {
+    display: flex;
+}
+.inactive-burger {
+    display: none;
+}
+
+.active-nav {
+    text-decoration: underline;
+    text-underline-offset: 5px;
+}

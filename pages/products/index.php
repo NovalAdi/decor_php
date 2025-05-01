@@ -2,96 +2,7 @@
 include "../../config.php";
 session_start();
 
-// if (isset($_POST['btnSearch']) || isset($_POST['btnFilter'])) {
-//     // Menyimpan search dan filter ke session
-
-//     if ($_POST['clearSearch'] == 1) {
-//         $_SESSION['search_query'] = '';
-//     }
-
-//     if (isset($_POST['search_query'])) {
-//         $_SESSION['search_query'] = $_POST['search_query'];
-//     }
-
-//     if (isset($_POST['tags'])) {
-//         $_SESSION['filter_tags'] = $_POST['tags'];
-//     } else {
-//         unset($_SESSION['filter_tags']);
-//     }
-
-//     if (isset($_POST['ratings'])) {
-//         $_SESSION['filter_ratings'] = $_POST['ratings'];
-//     } else {
-//         unset($_SESSION['filter_ratings']);
-//     }
-
-//     if (isset($_POST['price_from']) && isset($_POST['price_to'])) {
-//         $_SESSION['filter_price_from'] = $_POST['price_from'];
-//         $_SESSION['filter_price_to'] = $_POST['price_to'];
-//     } else {
-//         unset($_SESSION['filter_price_from'], $_SESSION['filter_price_to']);
-//     }
-
-//     // Menyiapkan query SQL dasar
-//     $sql = "
-//         SELECT p.id, p.nama, p.desk, p.gambar, p.harga, p.rating, GROUP_CONCAT(t.nama) AS tags 
-//         FROM produk p 
-//         LEFT JOIN produk_tag pt ON p.id = pt.id_produk 
-//         LEFT JOIN tag t ON pt.id_tag = t.id 
-//     ";
-
-//     $conditions = [];
-
-//     // Apply search query
-//     if (!empty($_SESSION['search_query'])) {
-//         $conditions[] = "p.nama LIKE '%" . $_SESSION['search_query'] . "%'";
-//     }
-
-//     // Apply tags filter
-//     if (!empty($_SESSION['filter_tags'])) {
-//         $tagList = array_map(function ($tag) use ($conn) {
-//             return "'" . mysqli_real_escape_string($conn, $tag) . "'";
-//         }, $_SESSION['filter_tags']);
-//         $conditions[] = "t.nama IN (" . implode(",", $tagList) . ")";
-//     }
-
-//     // Apply rating filter
-//     if (!empty($_SESSION['filter_ratings'])) {
-//         $ratingList = array_map('intval', $_SESSION['filter_ratings']);
-//         $conditions[] = "p.rating IN (" . implode(",", $ratingList) . ")";
-//     }
-
-//     // Apply price filter
-//     if (!empty($_SESSION['filter_price_from']) || !empty($_SESSION['filter_price_to'])) {
-//         $price_from = isset($_SESSION['filter_price_from']) ? intval($_SESSION['filter_price_from']) : 0;
-//         $price_to = isset($_SESSION['filter_price_to']) ? intval($_SESSION['filter_price_to']) : 0;
-//         $conditions[] = "(p.harga BETWEEN $price_from AND $price_to)";
-//     }
-
-//     // Gabung kondisi WHERE jika ada
-//     if (!empty($conditions)) {
-//         $sql .= " WHERE " . implode(' AND ', $conditions);
-//     }
-
-//     // Tetap group by
-//     $sql .= " GROUP BY p.id, p.nama, p.desk, p.harga, p.rating;";
-
-//     // Eksekusi query
-//     $result = mysqli_query($conn, $sql);
-
-//     $sd = mysqli_fetch_all($result, MYSQLI_ASSOC);
-
-//     if ($result) {
-//         $_SESSION['products'] = mysqli_fetch_all($result, MYSQLI_ASSOC);
-//         foreach ($_SESSION['products'] as &$product) {
-//             if (isset($product['tags'])) {
-//                 $product['tags'] = explode(',', $product['tags']);
-//             }
-//         }
-//     }
-// }
-
-$sql = "SELECT p.id, p.nama, p.desk, p.gambar, p.harga, p.rating, GROUP_CONCAT(t.nama) AS tags FROM produk p LEFT JOIN produk_tag pt ON p.id = pt.id_produk LEFT JOIN tag t ON pt.id_tag = t.id ";
+$sql = "SELECT p.id, p.nama, p.gambar, p.harga, p.rating, GROUP_CONCAT(t.nama) AS tags FROM produk p LEFT JOIN produk_tag pt ON p.id = pt.id_produk LEFT JOIN tag t ON pt.id_tag = t.id ";
 
 $conditions = [];
 
@@ -266,7 +177,7 @@ $_SESSION['tags'] = empty($rowTag) ? [] : $rowTag;
             <section class=" grid grid-cols-4 gap-3 mt-5">
                 <?php
                 foreach ($_SESSION['products'] as $product) { ?>
-                    <a class="bg-white hover:bg-gray-50 overflow-hidden flex flex-col gap-3 rounded-lg" href="/detail-product2/">
+                    <a class="bg-white hover:bg-gray-50 overflow-hidden flex flex-col gap-3 rounded-lg" href="../detail-product2/?id=<?= $product['id'] ?>">
                         <div class="relative">
                             <img class="bg-gray-200 h-[250px] object-contain" src="../../img/upload/<?= $product['gambar'] ?>" alt="">
                             <div class="flex gap-2 items-center absolute left-2 bottom-2">

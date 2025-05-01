@@ -55,7 +55,7 @@ if (isset($_POST['clearSearch'])) {
         <?php
         if ($_SESSION['role'] != 'admin') { ?>
             <form method="post" class="relative w-full max-w-md">
-                <div class="flex items-center border border-gray-300 rounded-full overflow-hidden shadow-sm focus-within:ring-2 focus-within:ring-[#B5733A] transition">
+                <div class="flex items-center bg-white border border-gray-300 rounded-full overflow-hidden shadow-sm focus-within:ring-2 focus-within:ring-[#B5733A] transition">
                     <i class="fa-solid fa-magnifying-glass px-4 text-gray-500"></i>
                     <input
                         type="text"

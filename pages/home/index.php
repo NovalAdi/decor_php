@@ -164,7 +164,6 @@ session_start();
 
     <?php include "../../components/footer.php" ?>
 
-    <script src="script.js"></script>
 </body>
 
 </html>

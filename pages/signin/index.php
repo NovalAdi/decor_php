@@ -13,6 +13,7 @@ if (isset($_POST['btnSubmit'])) {
             session_start();
             $_SESSION['username'] = $username;
             $_SESSION['role'] = $row['role'];
+            $_SESSION['id_user'] = $row['id'];
             if ($row['role'] == 'admin') {
                 header("Location: ../admin/");
             } else {
