@@ -24,7 +24,20 @@ $routes = $_SESSION['role'] == 'admin' ? [
     ],
     [
         'name' => 'Categories',
-        'path' => '../categories/',
+        'path' => [
+            [
+                'name' => 'Kitcken',
+                'path' => '../kitcken/',
+            ],
+            [
+                'name' => 'Bedroom',
+                'path' => '../bedroom/',
+            ],
+            [
+                'name' => 'Living room',
+                'path' => '../living-room/',
+            ],
+        ],
     ],
     [
         'name' => 'Contact',

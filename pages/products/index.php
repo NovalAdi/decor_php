@@ -2,88 +2,147 @@
 include "../../config.php";
 session_start();
 
-if (isset($_POST['btnSearch']) || isset($_POST['btnFilter'])) {
-    // Menyimpan search dan filter ke session
-    if (isset($_POST['search_query'])) {
-        $_SESSION['search_query'] = $_POST['search_query'];
-    }
+// if (isset($_POST['btnSearch']) || isset($_POST['btnFilter'])) {
+//     // Menyimpan search dan filter ke session
 
-    if (isset($_POST['tags'])) {
-        $_SESSION['filter_tags'] = $_POST['tags'];
-    } else {
-        unset($_SESSION['filter_tags']);  // Jika tidak ada filter tags, hapus
-    }
+//     if ($_POST['clearSearch'] == 1) {
+//         $_SESSION['search_query'] = '';
+//     }
 
-    if (isset($_POST['ratings'])) {
-        $_SESSION['filter_ratings'] = $_POST['ratings'];
-    } else {
-        unset($_SESSION['filter_ratings']);  // Jika tidak ada filter ratings, hapus
-    }
+//     if (isset($_POST['search_query'])) {
+//         $_SESSION['search_query'] = $_POST['search_query'];
+//     }
 
-    if (isset($_POST['price_from']) && isset($_POST['price_to'])) {
-        $_SESSION['filter_price_from'] = $_POST['price_from'];
-        $_SESSION['filter_price_to'] = $_POST['price_to'];
-    } else {
-        unset($_SESSION['filter_price_from'], $_SESSION['filter_price_to']);  // Jika tidak ada filter harga, hapus
-    }
+//     if (isset($_POST['tags'])) {
+//         $_SESSION['filter_tags'] = $_POST['tags'];
+//     } else {
+//         unset($_SESSION['filter_tags']);
+//     }
 
-    // Menyiapkan query SQL dasar
-    $sql = "
-        SELECT p.id, p.nama, p.desk, p.harga, p.rating, GROUP_CONCAT(t.nama) AS tags 
-        FROM produk p 
-        LEFT JOIN produk_tag pt ON p.id = pt.id_produk 
-        LEFT JOIN tag t ON pt.id_tag = t.id 
-    ";
+//     if (isset($_POST['ratings'])) {
+//         $_SESSION['filter_ratings'] = $_POST['ratings'];
+//     } else {
+//         unset($_SESSION['filter_ratings']);
+//     }
 
-    $conditions = [];
+//     if (isset($_POST['price_from']) && isset($_POST['price_to'])) {
+//         $_SESSION['filter_price_from'] = $_POST['price_from'];
+//         $_SESSION['filter_price_to'] = $_POST['price_to'];
+//     } else {
+//         unset($_SESSION['filter_price_from'], $_SESSION['filter_price_to']);
+//     }
 
-    // Apply search query
-    if (!empty($_SESSION['search_query'])) {
-        $conditions[] = "p.nama LIKE '%" . $_SESSION['search_query'] . "%'";
-    }
+//     // Menyiapkan query SQL dasar
+//     $sql = "
+//         SELECT p.id, p.nama, p.desk, p.gambar, p.harga, p.rating, GROUP_CONCAT(t.nama) AS tags 
+//         FROM produk p 
+//         LEFT JOIN produk_tag pt ON p.id = pt.id_produk 
+//         LEFT JOIN tag t ON pt.id_tag = t.id 
+//     ";
 
-    // Apply tags filter
-    if (!empty($_SESSION['filter_tags'])) {
-        $tagList = array_map(function ($tag) use ($conn) {
-            return "'" . mysqli_real_escape_string($conn, $tag) . "'";
-        }, $_SESSION['filter_tags']);
-        $conditions[] = "t.nama IN (" . implode(",", $tagList) . ")";
-    }
+//     $conditions = [];
 
-    // Apply rating filter
-    if (!empty($_SESSION['filter_ratings'])) {
-        $ratingList = array_map('intval', $_SESSION['filter_ratings']);
-        $conditions[] = "p.rating IN (" . implode(",", $ratingList) . ")";
-    }
+//     // Apply search query
+//     if (!empty($_SESSION['search_query'])) {
+//         $conditions[] = "p.nama LIKE '%" . $_SESSION['search_query'] . "%'";
+//     }
 
-    // Apply price filter
-    if (!empty($_SESSION['filter_price_from']) && !empty($_SESSION['filter_price_to'])) {
-        $price_from = intval($_SESSION['filter_price_from']);
-        $price_to = intval($_SESSION['filter_price_to']);
-        $conditions[] = "(p.harga BETWEEN $price_from AND $price_to)";
-    }
+//     // Apply tags filter
+//     if (!empty($_SESSION['filter_tags'])) {
+//         $tagList = array_map(function ($tag) use ($conn) {
+//             return "'" . mysqli_real_escape_string($conn, $tag) . "'";
+//         }, $_SESSION['filter_tags']);
+//         $conditions[] = "t.nama IN (" . implode(",", $tagList) . ")";
+//     }
 
-    // Gabung kondisi WHERE jika ada
-    if (!empty($conditions)) {
-        $sql .= " WHERE " . implode(' AND ', $conditions);
-    }
+//     // Apply rating filter
+//     if (!empty($_SESSION['filter_ratings'])) {
+//         $ratingList = array_map('intval', $_SESSION['filter_ratings']);
+//         $conditions[] = "p.rating IN (" . implode(",", $ratingList) . ")";
+//     }
 
-    // Tetap group by
-    $sql .= " GROUP BY p.id, p.nama, p.desk, p.harga, p.rating;";
+//     // Apply price filter
+//     if (!empty($_SESSION['filter_price_from']) || !empty($_SESSION['filter_price_to'])) {
+//         $price_from = isset($_SESSION['filter_price_from']) ? intval($_SESSION['filter_price_from']) : 0;
+//         $price_to = isset($_SESSION['filter_price_to']) ? intval($_SESSION['filter_price_to']) : 0;
+//         $conditions[] = "(p.harga BETWEEN $price_from AND $price_to)";
+//     }
 
-    // Eksekusi query
-    $result = mysqli_query($conn, $sql);
+//     // Gabung kondisi WHERE jika ada
+//     if (!empty($conditions)) {
+//         $sql .= " WHERE " . implode(' AND ', $conditions);
+//     }
 
-    if ($result) {
-        $_SESSION['products'] = mysqli_fetch_all($result, MYSQLI_ASSOC);
-        foreach ($_SESSION['products'] as &$product) {
-            if (isset($product['tags'])) {
-                $product['tags'] = explode(',', $product['tags']);
-            }
-        }
-        unset($product);
-    }
+//     // Tetap group by
+//     $sql .= " GROUP BY p.id, p.nama, p.desk, p.harga, p.rating;";
+
+//     // Eksekusi query
+//     $result = mysqli_query($conn, $sql);
+
+//     $sd = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+//     if ($result) {
+//         $_SESSION['products'] = mysqli_fetch_all($result, MYSQLI_ASSOC);
+//         foreach ($_SESSION['products'] as &$product) {
+//             if (isset($product['tags'])) {
+//                 $product['tags'] = explode(',', $product['tags']);
+//             }
+//         }
+//     }
+// }
+
+$sql = "SELECT p.id, p.nama, p.desk, p.gambar, p.harga, p.rating, GROUP_CONCAT(t.nama) AS tags FROM produk p LEFT JOIN produk_tag pt ON p.id = pt.id_produk LEFT JOIN tag t ON pt.id_tag = t.id ";
+
+$conditions = [];
+
+$_SESSION['tag_filter'] = $_POST['tags'];
+$_SESSION['rating_filter'] = $_POST['ratings'];
+$_SESSION['price_from'] = $_POST['price_from'];
+$_SESSION['price_to'] = $_POST['price_to'];
+
+if (isset($_SESSION['tag_filter'])) {
+    $conditions[] = "t.nama IN('" . implode(',', $_SESSION['tag_filter']) . "')";
 }
+
+if (isset($_SESSION['rating_filter'])) {
+    $conditions[] = "FLOOR(p.rating) IN (" . implode(',', $_SESSION['rating_filter']) . ")";
+}
+
+if (isset($_SESSION['search_query'])) {
+    $conditions[] = "p.nama LIKE '%" . $_SESSION['search_query'] . "%'";
+}
+
+$price_conditions = [];
+
+if (!empty($_SESSION['price_from'])) {
+    $price_from = intval($_SESSION['price_from']);
+    $price_conditions[] = "p.harga >= $price_from";
+}
+
+if (!empty($_SESSION['price_to'])) {
+    $price_to = intval($_SESSION['price_to']);
+    $price_conditions[] = "p.harga <= $price_to";
+}
+
+if (!empty($price_conditions)) {
+    $conditions[] = implode(' AND ', $price_conditions);
+}
+
+if (count($conditions) != 0) {
+    $sql .= "WHERE " . implode(' AND ', $conditions) . "";
+}
+
+$sql .= " GROUP BY p.id, p.nama, p.desk, p.harga, p.rating";
+$sqltag = "SELECT * FROM tag";
+
+$result = mysqli_query($conn, $sql);
+$row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+$resultTag = mysqli_query($conn, $sqltag);
+$rowTag = mysqli_fetch_all($resultTag, MYSQLI_ASSOC);
+
+$_SESSION['products'] = empty($row) ? [] : $row;
+$_SESSION['tags'] = empty($rowTag) ? [] : $rowTag;
+
 
 
 ?>
@@ -122,32 +181,39 @@ if (isset($_POST['btnSearch']) || isset($_POST['btnFilter'])) {
 
     <section class="grid grid-cols-4 pb-20 pt-10 mt-20">
         <!-- filter -->
-        <aside class="flex flex-col p-10 gap-3 drop-shadow-md bg-white ml-14 mr-7 rounded-xl border border-[1px] border-gray-200 h-min">
+        <aside class="flex flex-col py-10 px-6 gap-3 drop-shadow-md bg-white ml-14 mr-7 rounded-xl border border-[1px] border-gray-200 h-min">
             <form method="post">
-                <h1 class="text-2xl font-medium">Filter</h1>
+                <h1 class="text-2xl font-medium mb-2">Filter</h1>
                 <div>
                     <h1 class="font-medium">Tags</h1>
-                    <div class="ml-2 text-gray-700 mt-3">
+                    <div class="ml-2 text-gray-700 mt-3 flex flex-wrap gap-y-3 gap-x-2">
                         <?php
                         foreach ($_SESSION['tags'] as $tag) {
-                            // Periksa jika tag ada di filter yang disimpan di session
-                            $checked = (isset($_SESSION['filter_tags']) && in_array($tag['nama'], $_SESSION['filter_tags'])) ? 'checked' : '';
+                            $checked = isset($_SESSION['tag_filter']) && in_array($tag['nama'], $_SESSION['tag_filter']) ? 'checked' : '';
                         ?>
-                            <div class="flex gap-3 items-center">
-                                <input type="checkbox" name="tags[]" value="<?= $tag['nama'] ?>" <?= $checked ?>>
-                                <p><?= $tag['nama'] ?></p>
-                            </div>
+                            <label class="cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    name="tags[]"
+                                    value="<?= $tag['nama'] ?>"
+                                    <?= $checked ?>
+                                    class="peer hidden" />
+                                <span class="peer-checked:bg-[#B5733A] peer-checked:text-white bg-[#EFE7E2] text-[#B5733A] hover:bg-[#e9d7cc] px-3 py-1 rounded-full text-sm transition">
+                                    <?= $tag['nama'] ?>
+                                </span>
+                            </label>
+
                         <?php } ?>
                     </div>
                 </div>
-                <div>
+                <div class="mt-3">
                     <h1 class="font-medium">Rating</h1>
                     <div class="ml-2 text-gray-700 mt-3 flex flex-col gap-1">
                         <?php
                         $ratings = [5, 4, 3, 2, 1];
                         foreach ($ratings as $rating) {
                             // Periksa jika rating ada di filter yang disimpan di session
-                            $checked = (isset($_SESSION['filter_ratings']) && in_array($rating, $_SESSION['filter_ratings'])) ? 'checked' : '';
+                            $checked = (isset($_SESSION['rating_filter']) && in_array($rating, $_SESSION['rating_filter'])) ? 'checked' : '';
                         ?>
                             <div class="flex gap-3 items-center">
                                 <input type="checkbox" name="ratings[]" value="<?= $rating ?>" <?= $checked ?>>
@@ -161,19 +227,19 @@ if (isset($_POST['btnSearch']) || isset($_POST['btnFilter'])) {
                         <?php } ?>
                     </div>
                 </div>
-                <div class="flex flex-col gap-3">
+                <div class="flex flex-col gap-3 mt-3">
                     <h1 class="font-medium">Filter by Price</h1>
                     <div class="flex">
+                        <p class="flex items-center border-l-[1.5px] border-y-[1.5px] border-gray-400 rounded-l-lg px-2">Rp</p>
                         <input type="text" name="price_from" placeholder="From"
-                            class="p-2 border-l-[1.5px] border-y-[1.5px] border-gray-400 rounded-l-lg text-sm w-full"
+                            class="p-2 border border-[1.5px] border-gray-400 rounded-r-lg text-sm w-full"
                             value="<?= isset($_SESSION['price_from']) ? $_SESSION['price_from'] : '' ?>">
-                        <p class="flex items-center border border-[1.5px] border-gray-400 rounded-r-lg px-2">Rp</p>
                     </div>
                     <div class="flex">
+                        <p class="flex items-center border-l-[1.5px] border-y-[1.5px] border-gray-400 rounded-l-lg px-2">Rp</p>
                         <input type="text" name="price_to" placeholder="To"
-                            class="p-2 border-l-[1.5px] border-y-[1.5px] border-gray-400 rounded-l-lg text-sm w-full"
+                            class="p-2 border border-[1.5px] border-gray-400 rounded-r-lg text-sm w-full"
                             value="<?= isset($_SESSION['price_to']) ? $_SESSION['price_to'] : '' ?>">
-                        <p class="flex items-center border border-[1.5px] border-gray-400 rounded-r-lg px-2">Rp</p>
                     </div>
                 </div>
                 <input type="submit" name="btnFilter" class="mt-3 w-full text-white py-2 rounded-lg bg-[#B5733A]" value="Apply Filter">
@@ -186,7 +252,7 @@ if (isset($_POST['btnSearch']) || isset($_POST['btnFilter'])) {
 
             <!-- sort -->
             <div class="flex justify-between items-center">
-                <h1 class="text-xl font-medium">Show 12 product</h1>
+                <h1 class="text-xl font-medium">Show <?= count($_SESSION['products']) ?> products</h1>
                 <div class="flex items-center gap-3">
                     <p>Sort by</p>
                     <select class="px-2 py-1 border border-[1.5px] border-gray-400 rounded-lg text-sm">
@@ -202,7 +268,7 @@ if (isset($_POST['btnSearch']) || isset($_POST['btnFilter'])) {
                 foreach ($_SESSION['products'] as $product) { ?>
                     <a class="bg-white hover:bg-gray-50 overflow-hidden flex flex-col gap-3 rounded-lg" href="/detail-product2/">
                         <div class="relative">
-                            <img class="bg-gray-200 h-[250px] object-contain" src="../../img/bed.png" alt="">
+                            <img class="bg-gray-200 h-[250px] object-contain" src="../../img/upload/<?= $product['gambar'] ?>" alt="">
                             <div class="flex gap-2 items-center absolute left-2 bottom-2">
                                 <img src="/img/ikea.svg" class="w-[40px]" alt="">
                             </div>

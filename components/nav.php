@@ -1,3 +1,15 @@
+<?php
+if (isset($_POST['btnSearch'])) {
+    $_SESSION['search_query'] = $_POST['search_query'];
+    header('Location: ../products');
+}
+
+if (isset($_POST['clearSearch'])) {
+    $_SESSION['search_query'] = '';
+    header('Location: ../products');
+}
+?>
+
 <header class="fixed top-0 w-full py-5 flex justify-between items-center px-5 md:px-10 bg-white/85 z-10">
     <div class="w-full flex flex-col sm:flex-row sm:items-center sm:w-max gap-5 sm:gap-10">
         <div class="flex justify-between w-full">
@@ -20,35 +32,51 @@
             <?php
             include "../../routes.php";
             foreach ($routes as $route) {
-                if ($route['name'] == 'Categories') { ?>
-                    <div class="relative drop-down">
+                if (gettype($route['path']) != 'string') { ?>
+                    <div class="relative group">
                         <div id="categories" class="flex gap-3 items-center hover:text-[#B5733A] cursor-pointer">
                             <p>Categories</p>
-                            <i class="fa-solid fa-caret-down"></i>
+                            <i class="fa-solid fa-caret-down transition-transform duration-300 group-hover:rotate-180"></i>
                         </div>
-                        <div id="categories-drop" class="inactive-drop">
-                            <a href="/categories/Kitchen/" class="sm:px-3 hover:text-[#B5733A] sm:py-1.5">Kitchen</a>
-                            <div class="h-[1px] bg-gray-300 max-[768px]:hidden"></div>
-                            <a href="/categories/BedRoom/" class="sm:px-3 hover:text-[#B5733A] sm:py-1.5 w-max">Bed Room</a>
-                            <div class="h-[1px] bg-gray-300 max-[768px]:hidden"></div>
-                            <a href="/categories/LivingRoom/" class="sm:px-3 hover:text-[#B5733A] sm:py-1.5 w-max">Living Room</a>
+                        <div class="absolute text-sm bg-white border rounded shadow-md mt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-20">
+                            <?php foreach ($route['path'] as $subroute) { ?>
+                                <a href="<?= $subroute['path'] ?>" class="block px-4 py-2 hover:bg-gray-100"><?= $subroute['name'] ?></a>
+                            <?php } ?>
                         </div>
                     </div>
-            <?php } else {
-                    echo '<a class="hover:text-[#B5733A]" href="' . $route['path'] . '">' . $route['name'] . '</a>';
-                }
-            }
-            ?>
+
+                <?php } else { ?>
+                    <a class="hover:text-[#B5733A]" href="<?= $route['path'] ?>"><?= $route['name'] ?></a>
+            <?php }
+            } ?>
         </div>
     </div>
     <div class="sm:flex items-center gap-7 text-xl text-gray-700 hidden">
         <?php
         if ($_SESSION['role'] != 'admin') { ?>
-            <form method="post" class="relative">
-                <input type="text" name="search_query" value="<?= $_SESSION['search_query'] ?>" placeholder="Search" class="p-2 pl-10 border border-[1.5px] border-gray-400 rounded-xl text-sm w-[300px] text-sm">
-                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
-                <input type="submit" name="btnSearch" class="hidden">
+            <form method="post" class="relative w-full max-w-md">
+                <div class="flex items-center border border-gray-300 rounded-full overflow-hidden shadow-sm focus-within:ring-2 focus-within:ring-[#B5733A] transition">
+                    <i class="fa-solid fa-magnifying-glass px-4 text-gray-500"></i>
+                    <input
+                        type="text"
+                        name="search_query"
+                        value="<?= isset($_SESSION['search_query']) ? $_SESSION['search_query'] : '' ?>"
+                        placeholder="Search for products..."
+                        class="flex-1 py-2 pr-10 text-sm focus:outline-none">
+                    <input type="submit" name="btnSearch" class="hidden">
+                    <?php if (!empty($_SESSION['search_query'])): ?>
+                        <button
+                            type="submit"
+                            name="clearSearch"
+                            value="1"
+                            class="px-3 text-gray-400 hover:text-black transition"
+                            title="Clear search">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    <?php endif; ?>
+                </div>
             </form>
+
         <?php } ?>
         <?php
         if (!isset($_SESSION['username'])) { ?>
@@ -61,7 +89,14 @@
             if ($_SESSION['role'] != 'admin') { ?>
                 <a href="../cart"><i class="fa-solid fa-cart-shopping"></i></a>
             <?php } ?>
-            <a href="../signin"><img class="rounded-[100%] h-[30px]" src="../../img/default_pp.png" alt=""></a>
+            <div class="relative group">
+                <img class="rounded-full w-[40px] cursor-pointer" src="../../img/default_pp.png" alt="">
+                <div class="text-sm absolute right-0 bg-white border rounded shadow-md mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-20">
+                    <a href="" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
+                    <a href="../logout" class="text-red-600 block px-4 py-2 hover:bg-gray-100">Logout</a>
+                </div>
+            </div>
+
         <?php } ?>
     </div>
 </header>
