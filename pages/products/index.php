@@ -12,7 +12,11 @@ $_SESSION['price_from'] = $_POST['price_from'];
 $_SESSION['price_to'] = $_POST['price_to'];
 
 if (isset($_SESSION['tag_filter'])) {
-    $conditions[] = "t.nama IN('" . implode(',', $_SESSION['tag_filter']) . "')";
+    $tags = array_map(function ($tag) {
+        return "'" . $tag . "'";
+    }, $_SESSION['tag_filter']);
+
+    $conditions[] = "t.nama IN(" . implode(',', $tags) . ")";
 }
 
 if (isset($_SESSION['rating_filter'])) {

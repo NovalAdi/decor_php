@@ -73,20 +73,20 @@ session_start();
                     <img class="block lg:hidden w-[200px] lg:w-[250px]" src="<?= IMG_PATH ?>Group_15.svg" alt="">
                     <div class="flex flex-col gap-6">
                         <h1 class="text-2xl sm:text-4xl font-medium text-[#B5733A]">Why Us?</h1>
-                        <p class="text-sm sm:text-base text-gray-700">Lorem ipsum dolor sit amet consectetur adipisicing elit. In, temporibus magnam cum sunt ipsa facilis neque autem dolorum dolorem, adipisci aperiam ipsam deserunt eaque nesciunt voluptatem libero incidunt et beatae.</p>
+                        <p class="text-sm sm:text-base text-gray-700">Your space deserves more than just furniture — it deserves character. With our curated collection of premium decor and furniture, we turn ordinary rooms into inspiring, stylish living experiences.</p>
                     </div>
                 </div>
                 <div>
                     <h1 class="font-bold text-base sm:text-lg">Designer Art</h1>
-                    <p class="ml-3 mt-2 text-sm sm:text-base text-gray-700">There are many variations of passages of lorem ipsum available, but the majority have suffered alteration in some form.</p>
+                    <p class="ml-3 mt-2 text-sm sm:text-base text-gray-700">Our products are crafted by professional designers, combining modern aesthetics with timeless elegance to suit various interior styles.</p>
                 </div>
                 <div>
                     <h1 class="font-bold text-base sm:text-lg">High Quality</h1>
-                    <p class="ml-3 mt-2 text-sm sm:text-base text-gray-700">There are many variations of passages of lorem ipsum available, but the majority have suffered alteration in some form.</p>
+                    <p class="ml-3 mt-2 text-sm sm:text-base text-gray-700">We prioritize quality above all — using premium materials to ensure durability, comfort, and long-lasting satisfaction.</p>
                 </div>
                 <div>
                     <h1 class="font-bold text-base sm:text-lg">Branded Product</h1>
-                    <p class="ml-3 mt-2 text-sm sm:text-base text-gray-700">There are many variations of passages of lorem ipsum available, but the majority have suffered alteration in some form.</p>
+                    <p class="ml-3 mt-2 text-sm sm:text-base text-gray-700">We partner with trusted brands to guarantee authenticity and reliability, so you always receive the best in every purchase.</p>
                 </div>
             </div>
         </section>
