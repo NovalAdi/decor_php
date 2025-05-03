@@ -8,6 +8,11 @@ $result = mysqli_query($conn, $sql);
 if ($result) {
     $_SESSION['data'] = mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
+
+if (isset($_POST['btnCheckOut'])) {
+    $products = $_POST['products'];
+    
+}
 ?>
 
 <!DOCTYPE html>
@@ -39,7 +44,9 @@ if ($result) {
 
     <?php include "../../components/nav.php"; ?>
 
-    <section class="flex justify-center mt-32">
+ <form method="POST">
+ <section class="flex justify-center mt-32">
+    <h1><?php var_dump($_POST['products']);?></h1>
         <table class="w-[95%]">
             <thead align="left" class="bg-gray-100">
                 <th class="py-3 pl-3">PRODUCT</th>
@@ -53,7 +60,7 @@ if ($result) {
                     <tr class="h-[90px] item-cart <?= $key % 2 == 0 ? 'bg-gray-50' : 'bg-gray-100' ?>">
                         <td>
                             <div class="flex items-center gap-3 pl-3">
-                                <input type="checkbox" name="" id="">
+                                <input type="checkbox" name="products[]" value="<?= $data['id']?>">
                                 <img class="object-cover w-[60px] h-[60px] rounded-lg" src="../../img/upload/<?= $data['gambar'] ?>" alt="">
                                 <h1><?= $data['nama'] ?></h1>
                             </div>
@@ -84,10 +91,11 @@ if ($result) {
         <div class="flex justify-between w-[95%]">
             <button class="px-20 py-2 text-[#B5733A] font-medium rounded-full border-2 border-[#B5733A]">Use Promo
                 Code</button>
-            <a class="px-20 py-2 text-white font-medium rounded-full bg-[#B5733A] border-2 border-[#B5733A]"
-                href="./checkout/">Checkout</a>
+            <input class="px-20 py-2 text-white font-medium rounded-full bg-[#B5733A] border-2 border-[#B5733A]"
+                value="CheckOut" name="btnCheckOut" type="submit">
         </div>
     </section>
+ </form>
 
     <?php include "../../components/footer.php" ?>
 
