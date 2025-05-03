@@ -2,16 +2,30 @@
 include "../../config.php";
 session_start();
 
-$sql = "SELECT c.id, p.nama, p.gambar, p.harga, c.quantity FROM cart c JOIN produk p ON c.id_produk = p.id JOIN user u ON c.id_user = u.id WHERE u.id = " . $_SESSION['id_user'];
+$sql = "SELECT c.id, p.nama, p.gambar, p.harga, c.quantity, c.id_pesanan FROM cart c JOIN produk p ON c.id_produk = p.id JOIN user u ON c.id_user = u.id WHERE u.id = " . $_SESSION['id_user'];
 $result = mysqli_query($conn, $sql);
 
 if ($result) {
     $_SESSION['data'] = mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
 
-if (isset($_POST['btnCheckOut'])) {
+if (isset($_POST['btnCheckOut']) && $_POST['products']) {
     $products = $_POST['products'];
-    
+
+    $sql = "INSERT INTO `pesanan` (`id`, `id_user`, `status`, `created_at`, `updated_at`) VALUES (NULL, " . $_SESSION['id_user'] . ", 'Dikemas', current_timestamp(), current_timestamp());";
+
+    $result = mysqli_query($conn, $sql);
+    if ($result) {
+        $id_pesanan = mysqli_insert_id($conn);
+
+        foreach ($products as $key => $value) {
+            $sqlUpdate = "UPDATE `cart` SET `id_pesanan` = '$id_pesanan' WHERE `cart`.`id` = $value";
+            $result = mysqli_query($conn, $sqlUpdate);
+        }
+    }
+    unset($_POST);
+
+    header('Location: ../checkout');
 }
 ?>
 
@@ -44,58 +58,59 @@ if (isset($_POST['btnCheckOut'])) {
 
     <?php include "../../components/nav.php"; ?>
 
- <form method="POST">
- <section class="flex justify-center mt-32">
-    <h1><?php var_dump($_POST['products']);?></h1>
-        <table class="w-[95%]">
-            <thead align="left" class="bg-gray-100">
-                <th class="py-3 pl-3">PRODUCT</th>
-                <th>PRICE</th>
-                <th>QUANTITY</th>
-                <th>TOTAL</th>
-                <th></th>
-            </thead>
-            <tbody>
-                <?php foreach ($_SESSION['data'] as $key => $data) { ?>
-                    <tr class="h-[90px] item-cart <?= $key % 2 == 0 ? 'bg-gray-50' : 'bg-gray-100' ?>">
-                        <td>
-                            <div class="flex items-center gap-3 pl-3">
-                                <input type="checkbox" name="products[]" value="<?= $data['id']?>">
-                                <img class="object-cover w-[60px] h-[60px] rounded-lg" src="../../img/upload/<?= $data['gambar'] ?>" alt="">
-                                <h1><?= $data['nama'] ?></h1>
-                            </div>
-                        </td>
-                        <td>
-                            <p>Rp.<?= number_format($data['harga'], 0, ',', '.') ?></p>
-                        </td>
-                        <td>
-                            <div class="counter flex">
-                                <button class="h-[30px] w-[30px] text-2xl bg-white justify-center items-center ">-</button>
-                                <input type="text" class="w-[30px] text-center bg-gray-300" disabled value="<?= $data['quantity'] ?>" min="1">
-                                <button
-                                    class="h-[30px] w-[30px] text-2xl bg-white flex justify-center items-center">+</button>
-                            </div>
-                        </td>
-                        <td>
-                            <p>Rp.<?= number_format(($data['harga'] * $data['quantity']), 0, ',', '.')  ?></p>
-                        </td>
-                        <td>
-                            <a href="">X</a>
-                        </td>
-                    </tr>
-                <?php } ?>
-            </tbody>
-        </table>
-    </section>
-    <section class="flex justify-center mt-7 mb-32">
-        <div class="flex justify-between w-[95%]">
-            <button class="px-20 py-2 text-[#B5733A] font-medium rounded-full border-2 border-[#B5733A]">Use Promo
-                Code</button>
-            <input class="px-20 py-2 text-white font-medium rounded-full bg-[#B5733A] border-2 border-[#B5733A]"
-                value="CheckOut" name="btnCheckOut" type="submit">
-        </div>
-    </section>
- </form>
+    <form method="POST">
+        <section class="flex justify-center mt-32">
+            <table class="w-[95%]">
+                <thead align="left" class="bg-gray-100">
+                    <th class="py-3 pl-3">PRODUCT</th>
+                    <th>PRICE</th>
+                    <th>QUANTITY</th>
+                    <th>TOTAL</th>
+                    <th></th>
+                </thead>
+                <tbody>
+                    <?php foreach ($_SESSION['data'] as $key => $data) {
+                        if ($data['id_pesanan'] == '') { ?>
+                            <tr class="h-[90px] item-cart <?= $key % 2 == 0 ? 'bg-gray-50' : 'bg-gray-100' ?>">
+                                <td>
+                                    <div class="flex items-center gap-3 pl-3">
+                                        <input type="checkbox" name="products[]" value="<?= $data['id'] ?>">
+                                        <img class="object-cover w-[60px] h-[60px] rounded-lg" src="../../img/upload/<?= $data['gambar'] ?>" alt="">
+                                        <h1><?= $data['nama'] ?></h1>
+                                    </div>
+                                </td>
+                                <td>
+                                    <p>Rp.<?= number_format($data['harga'], 0, ',', '.') ?></p>
+                                </td>
+                                <td>
+                                    <div class="counter flex">
+                                        <button class="h-[30px] w-[30px] text-2xl bg-white justify-center items-center ">-</button>
+                                        <input type="text" class="w-[30px] text-center bg-gray-300" disabled value="<?= $data['quantity'] ?>" min="1">
+                                        <button
+                                            class="h-[30px] w-[30px] text-2xl bg-white flex justify-center items-center">+</button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <p>Rp.<?= number_format(($data['harga'] * $data['quantity']), 0, ',', '.')  ?></p>
+                                </td>
+                                <td>
+                                    <a href="">X</a>
+                                </td>
+                            </tr>
+                    <?php }
+                    } ?>
+                </tbody>
+            </table>
+        </section>
+        <section class="flex justify-center mt-7 mb-32">
+            <div class="flex justify-between w-[95%]">
+                <button class="px-20 py-2 text-[#B5733A] font-medium rounded-full border-2 border-[#B5733A]">Use Promo
+                    Code</button>
+                <input class="px-20 py-2 text-white font-medium rounded-full bg-[#B5733A] border-2 border-[#B5733A]"
+                    value="CheckOut" name="btnCheckOut" type="submit">
+            </div>
+        </section>
+    </form>
 
     <?php include "../../components/footer.php" ?>
 
