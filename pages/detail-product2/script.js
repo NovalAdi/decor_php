@@ -35,28 +35,3 @@ function change(change) {
 // }
 
 // JavaScript
-let counter = document.getElementById('counter');
-let harga = document.getElementById('harga');
-let number = parseInt(harga.value.replace(/[^0-9]/g, ''));
-let hargaSatuan = number / counter.value;
-
-function formatRupiah(angka) {
-    return "Rp." + angka.toLocaleString("id-ID");
-}
-
-function updateHarga() {
-    let total = hargaSatuan * parseInt(counter.value);
-    harga.value = formatRupiah(total);
-}
-
-function addCounter() {
-    counter.value = parseInt(counter.value) + 1;
-    updateHarga();
-}
-
-function minusCounter() {
-    if (parseInt(counter.value) > 1) {
-        counter.value = parseInt(counter.value) - 1;
-        updateHarga();
-    }
-}

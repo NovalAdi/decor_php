@@ -75,14 +75,13 @@ if (isset($_POST['btnCheckOut']) && $_POST['products']) {
                                 </td>
                                 <td>
                                     <div class="counter flex">
-                                        <button class="h-[30px] w-[30px] text-2xl bg-white justify-center items-center ">-</button>
-                                        <input type="text" class="w-[30px] text-center bg-gray-300" disabled value="<?= $data['quantity'] ?>" min="1">
-                                        <button
-                                            class="h-[30px] w-[30px] text-2xl bg-white flex justify-center items-center">+</button>
+                                        <button type="button" class="btn-minus h-[30px] w-[30px] text-2xl bg-white">-</button>
+                                        <input type="text" class="qty-input w-[30px] text-center bg-gray-300" readonly value="<?= $data['quantity'] ?>">
+                                        <button type="button" class="btn-plus h-[30px] w-[30px] text-2xl bg-white">+</button>
                                     </div>
                                 </td>
                                 <td>
-                                    <p>Rp.<?= number_format(($data['harga'] * $data['quantity']), 0, ',', '.')  ?></p>
+                                    <input class="harga-total bg-transparent" type="text" readonly value="Rp.<?= number_format(($data['harga'] * $data['quantity']), 0, ',', '.') ?>">
                                 </td>
                                 <td>
                                     <a href="">X</a>
@@ -113,7 +112,48 @@ if (isset($_POST['btnCheckOut']) && $_POST['products']) {
 
     <?php include "../../components/footer.php" ?>
 
-    <script src="./script.js"></script>
+    <script>
+        const items = document.getElementsByClassName("item-cart");
+
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+
+            const counter = item.querySelector(".counter");
+            const btnMinus = counter.querySelector(".btn-minus");
+            const inputQty = counter.querySelector(".qty-input");
+            const btnPlus = counter.querySelector(".btn-plus");
+
+            const hargaText = item.querySelector("td:nth-child(2) p").innerText;
+            const hargaTotal = item.querySelector(".harga-total");
+
+            const hargaSatuan = parseInt(hargaText.replace(/[^0-9]/g, ''));
+
+            function formatRupiah(angka) {
+                return "Rp." + angka.toLocaleString("id-ID");
+            }
+
+            function updateHarga() {
+                const qty = parseInt(inputQty.value);
+                const total = hargaSatuan * qty;
+                hargaTotal.value = formatRupiah(total);
+            }
+
+            btnMinus.addEventListener("click", () => {
+                let qty = parseInt(inputQty.value);
+                if (qty > 1) {
+                    inputQty.value = qty - 1;
+                    updateHarga();
+                }
+            });
+
+            btnPlus.addEventListener("click", () => {
+                let qty = parseInt(inputQty.value);
+                inputQty.value = qty + 1;
+                updateHarga();
+            });
+        }
+    </script>
+
 </body>
 
 </html>

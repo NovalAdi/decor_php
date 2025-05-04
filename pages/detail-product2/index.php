@@ -11,6 +11,15 @@ if ($result) {
 	$_SESSION['product'] = mysqli_fetch_all($result, MYSQLI_ASSOC)[0];
 }
 
+if (isset($_POST['btnAddToCart'])) {
+	$sqlC = "INSERT INTO cart (id, id_produk, id_user, id_pesanan, quantity) VALUES (NULL, " . $_SESSION['product']['id'] . ", " . $_SESSION['id_user'] . ", NULL, " . $_POST['quantity'] . ")";
+	$resultC = mysqli_query($conn, $sqlC);
+
+
+	if ($resultC) {
+		header("Location: ../cart");
+	}
+}
 ?>
 
 <!DOCTYPE html>
@@ -43,84 +52,105 @@ if ($result) {
 	<?php include "../../components/nav.php"; ?>
 
 	<!-- detail Produk -->
-
-	<section class="detail mt-24">
-		<div class="box flexx">
-			<div class="left">
-				<div class="main-img">
-					<img  src="../../img/upload/<?= $_SESSION['product']['gambar'] ?>" alt="" class="slide">
+	<form method="post">
+		<section class="detail mt-24">
+			<div class="box flexx">
+				<div class="left">
+					<div class="main-img">
+						<img src="../../img/upload/<?= $_SESSION['product']['gambar'] ?>" alt="" class="slide" style="width: 450px; height: 300px; object-fit: cover;">
+					</div>
 				</div>
-				<div class="option flex">
-					<img src="../../img/sofa.png" alt="">
+				<div class="right">
+					<div class="product">
+						<h3 class="title"><?= $_SESSION['product']['nama'] ?></h3>
+						<div class="sells">
+							<i class="fa-solid fa-star star"></i>
+							<p id="rating"><?= $_SESSION['product']['rating'] ?></p>
+							<p>|</p>
+							<p>32 reviews</p>
+						</div>
+					</div>
+					<div class="deskripsi">
+						<div class="prc1">
+							<h1 id="price">Rp.<?= number_format($_SESSION['product']['harga'], 0, ',', '.') ?></h1>
+						</div>
+						<div class="detail1">
+							<p id="detail"><?= $_SESSION['product']['desk'] ?></p>
+						</div>
+					</div>
 				</div>
-			</div>
-			<div class="right">
-				<div class="product">
-					<h3 class="title"><?= $_SESSION['product']['nama'] ?></h3>
-					<div class="sells">
-						<i class="fa-solid fa-star star"></i>
-						<p id="rating"><?= $_SESSION['product']['rating'] ?></p>
+				<div class="middle">
+					<div class="checkout-sect">
+						<h1>Atur Jumlah</h1>
+						<div class="stock">
+							<h5 class="mt-2">Quantity</h5>
+						</div>
+						<div class="flex gap-2 mb-5 mt-2">
+							<button type="button" class="w-[30px] p-1 border rounded-full border-1 text-center hover:bg-gray-200"
+								onclick="minusCounter()">-</button>
+							<input class="py-1 px-2 border rounded-full border-1 w-[50px] text-center bg-white" id="counter"
+								type="text" readonly value="1" min="1" name="quantity">
+							<button type="button" class="w-[30px] p-1 border rounded-full border-1 text-center hover:bg-gray-200"
+								onclick="addCounter()">+</button>
+						</div>
+						<div class="total">
+							<p id="total">Total</p>
+							<input type="text" class="text-end" id="harga" disabled
+								value="Rp.<?= number_format($_SESSION['product']['harga'], 0, ',', '.') ?>">
+						</div>
+						<input class="btn" name="btnAddToCart" type="submit" value="Add To Cart">
+					</div>
+					<div class="option2">
+						<div class="icon">
+							<i class="fa-regular fa-comment"></i>
+							<p>Chat</p>
+						</div>
 						<p>|</p>
-						<p>32 reviews</p>
+						<div class="icon">
+							<i class="fa-regular fa-heart"></i>
+							<p>Wishlist</p>
+						</div>
+						<p>|</p>
+						<div class="icon">
+							<i class="fa-solid fa-arrow-up-from-bracket"></i>
+							<p>Share</p>
+						</div>
 					</div>
 				</div>
-				<div class="deskripsi">
-					<div class="prc1">
-						<h1 id="price">Rp.<?= number_format($_SESSION['product']['harga'], 0, ',', '.') ?></h1>
-					</div>
-					<div class="detail1">
-						<p id="detail"><?= $_SESSION['product']['desk'] ?></p>
-					</div>
+			</div>
+		</section>
+	</form>
 
-					<!-- <h5>Color - Lightgrey</h5>
-					<div class="color flexx">
-						<span></span>
-						<span></span>
-						<span></span>
-					</div> -->
-				</div>
-			</div>
-			<div class="middle">
-				<div class="checkout-sect">
-					<h1>Atur Jumlah</h1>
-					<div class="stock">
-						<h5 class="mt-2">Quantity</h5>
-					</div>
-					<div class="flex gap-2 mb-5 mt-2">
-						<button class="w-[30px] p-1 border rounded-full border-1 text-center hover:bg-gray-200" onclick="minusCounter()">-</button>
-						<input class="py-1 px-2 border rounded-full border-1 w-[50px] text-center bg-white" id="counter" type="text" disabled value="1" min="1">
-						<button class="w-[30px] p-1 border rounded-full border-1 text-center hover:bg-gray-200" onclick="addCounter()">+</button>
-					</div>
-					<div class="total">
-						<p id="total">Total</p>
-						<input type="text" class="text-end" id="harga" disabled value="Rp.<?= number_format($_SESSION['product']['harga'], 0, ',', '.') ?>">
-					</div>
-					<button class="btn">Add To Cart</button>
-				</div>
-				<div class="option2">
-					<div class="icon">
-						<i class="fa-regular fa-comment"></i>
-						<p>Chat</p>
-					</div>
-					<p>|</p>
-					<div class="icon">
-						<i class="fa-regular fa-heart"></i>
-						<p>Wishlist</p>
-					</div>
-					<p>|</p>
-					<div class="icon">
-						<i class="fa-solid fa-arrow-up-from-bracket"></i>
-						<p>Share</p>
-					</div>
-				</div>
-			</div>
-		</div>
-		</div>
-	</section>
 
 	<?php include "../../components/footer.php" ?>
 
-	<script src="script.js"></script>
+	<script>
+		let counter = document.getElementById('counter');
+		let harga = document.getElementById('harga');
+		let number = parseInt(harga.value.replace(/[^0-9]/g, ''));
+		let hargaSatuan = number / counter.value;
+
+		function formatRupiah(angka) {
+			return "Rp." + angka.toLocaleString("id-ID");
+		}
+
+		function updateHarga() {
+			let total = hargaSatuan * parseInt(counter.value);
+			harga.value = formatRupiah(total);
+		}
+
+		function addCounter() {
+			counter.value = parseInt(counter.value) + 1;
+			updateHarga();
+		}
+
+		function minusCounter() {
+			if (parseInt(counter.value) > 1) {
+				counter.value = parseInt(counter.value) - 1;
+				updateHarga();
+			}
+		}
+	</script>
 </body>
 
 </html>

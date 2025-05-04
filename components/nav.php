@@ -92,7 +92,7 @@ if (isset($_POST['clearSearch'])) {
             <div class="relative group">
                 <img class="rounded-full w-[40px] cursor-pointer" src="../../img/default_pp.png" alt="">
                 <div class="text-sm absolute right-0 bg-white border rounded shadow-md mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-20">
-                    <a href="" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
+                    <a href="../profile" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
                     <a href="../logout" class="text-red-600 block px-4 py-2 hover:bg-gray-100">Logout</a>
                 </div>
             </div>
