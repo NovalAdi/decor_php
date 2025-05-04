@@ -2,22 +2,30 @@
 include "../../config.php";
 session_start();
 
-// if (isset($_POST['btnCheckOut']) && $_POST['products']) {
-//     $products = $_POST['products'];
+$sql = "SELECT c.id, p.nama, p.gambar, p.harga, c.quantity, c.id_pesanan FROM cart c JOIN produk p ON c.id_produk = p.id JOIN user u ON c.id_user = u.id WHERE u.id = " . $_SESSION['id_user'] . " AND c.id IN(" . implode(',', $_SESSION['checkout']) . ")";
 
-//     $sql = "INSERT INTO `pesanan` (`id`, `id_user`, `status`, `created_at`, `updated_at`) VALUES (NULL, " . $_SESSION['id_user'] . ", 'Dikemas', current_timestamp(), current_timestamp());";
+$result = mysqli_query($conn, $sql);
 
-//     $result = mysqli_query($conn, $sql);
-//     if ($result) {
-//         $id_pesanan = mysqli_insert_id($conn);
+if ($result) {
+    $_SESSION['data_checkout'] = mysqli_fetch_all($result, MYSQLI_ASSOC);
+}
 
-//         foreach ($products as $key => $value) {
-//             $sqlUpdate = "UPDATE `cart` SET `id_pesanan` = '$id_pesanan' WHERE `cart`.`id` = $value";
-//             $result = mysqli_query($conn, $sqlUpdate);
-//         }
-//     }
-//     unset($_POST);
-// }
+if (isset($_POST['btnCheckOut']) && $_SESSION['checkout']) {
+    $products = $_SESSION['checkout'];
+
+    $sql = "INSERT INTO `pesanan` (`id`, `id_user`, `status`, `created_at`, `updated_at`) VALUES (NULL, " . $_SESSION['id_user'] . ", 'Dikemas', current_timestamp(), current_timestamp());";
+
+    $result = mysqli_query($conn, $sql);
+    if ($result) {
+        $id_pesanan = mysqli_insert_id($conn);
+
+        foreach ($products as $key => $value) {
+            $sqlUpdate = "UPDATE `cart` SET `id_pesanan` = '$id_pesanan' WHERE `cart`.`id` = $value";
+            $result = mysqli_query($conn, $sqlUpdate);
+        }
+    }
+    unset($_POST);
+}
 ?>
 
 <!DOCTYPE html>
@@ -68,7 +76,7 @@ session_start();
                 <div class="store">
                     <div class="store-title">Decor Official Store</div>
                     <div>
-                        <?php foreach ($_SESSION['data'] as $key => $data) { ?>
+                        <?php foreach ($_SESSION['data_checkout'] as $key => $data) { ?>
                             <div class="product">
                                 <img src="../../img/upload/<?= $data['gambar'] ?>">
                                 <div class="product-details">

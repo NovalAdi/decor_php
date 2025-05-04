@@ -14,6 +14,11 @@ if ($result) {
         }
     }
 }
+
+if (isset($_POST['btnCheckOut'])) {
+    $_SESSION['checkout'] = $_POST['products'];
+    header("Location: ../checkout");
+}
 ?>
 
 <!DOCTYPE html>
@@ -44,7 +49,7 @@ if ($result) {
 
     <?php include "../../components/nav.php"; ?>
 
-    <form method="POST" action="../checkout/" class="my-32">
+    <form method="POST" class="my-32">
         <section class="flex justify-center">
             <table class="w-[95%]">
                 <thead align="left" class="bg-gray-100">
