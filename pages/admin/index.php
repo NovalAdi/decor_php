@@ -50,18 +50,18 @@ if ($result) {
             <table class="min-w-full table-auto border-collapse">
                 <thead align="left" class="bg-gray-100">
                     <tr>
-                        <th class="py-3 pl-3 w-3/6">Products</th>
-                        <th class="w-1/6">Price</th>
-                        <th class="w-1/4">Tags</th>
-                        <th class="w-1/4">Rating</th>
-                        <th class="w-1/6">Stocks</th>
-                        <th class="w-1/6">Action</th>
+                        <th class="py-3 pl-3">Products</th>
+                        <th>Price</th>
+                        <th>Tags</th>
+                        <th>Rating</th>
+                        <th>Stocks</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (count($_SESSION['data']) != 0) {
                         foreach ($_SESSION['data'] as $key => $data) { ?>
-                            <tr class="h-[90px] <?= $key % 2 == 0 ? 'bg-gray-50' : 'bg-gray-100' ?>">
+                            <tr class="h-[100px] <?= $key % 2 == 0 ? 'bg-gray-50' : 'bg-gray-100' ?>">
                                 <td>
                                     <div class="flex items-center gap-3 pl-3">
                                         <img class="object-cover w-[60px] h-[60px] rounded-lg" src="../../img/upload/<?= $data['gambar'] ?>" alt="">
@@ -72,13 +72,16 @@ if ($result) {
                                     <p>Rp.<?= number_format($data['harga'], 0, ',', '.') ?></p>
                                 </td>
                                 <td>
-                                    <div class="flex flex-wrap gap-2">
+                                    <div class="flex flex-wrap gap-2 max-w-96">
                                         <?php
                                         $tags = explode(',', $data['tags']);
                                         foreach ($tags as $tag) { ?>
                                             <span class="bg-[#EFE7E2] text-[#B5733A] px-3 py-1 rounded-full text-sm"><?= $tag ?></span>
                                         <?php } ?>
                                     </div>
+                                </td>
+                                <td>
+                                    <p class="flex gap-2 items-center"><img class="w-[15px] h-[15px]" src="../../img/star.png" alt=""><?= $data['rating'] ?></p>
                                 </td>
                                 <td>
                                     <p><?= $data['stok'] ?></p>

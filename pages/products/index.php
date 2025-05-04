@@ -229,14 +229,13 @@ $_SESSION['tags'] = empty($rowTag) ? [] : $rowTag;
     <section class="grid grid-cols-2 gap-10 px-16 mb-20">
         <div class="bg-[url('../../img/indus-2.jpg')] bg-center bg-no-repeat bg-cover h-[200px] rounded-xl overflow-hidden">
             <div class="bg-gray-900/30 w-full h-full flex justify-center items-center p-20">
-                <h1 class="tracking-wider text-3xl font-bold text-white text-center">Checkout our Industial collection
+                <h1 class="tracking-wider text-3xl font-bold text-white text-center">Explore Our Exclusive Annual Sale
                 </h1>
             </div>
         </div>
-        <div class="bg-[url('../../img/sc-2.webp')] bg-center bg-no-repeat bg-cover h-[200px] rounded-xl overflow-hidden">
+        <div class="bg-[url('../../img/jp-2.png')] bg-center bg-no-repeat bg-cover h-[200px] rounded-xl overflow-hidden">
             <div class="bg-gray-900/30 w-full h-full flex justify-center items-center p-20">
-                <h1 class="tracking-wider text-3xl font-bold text-white text-center">Checkout our Scandinavian
-                    collection</h1>
+                <h1 class="tracking-wider text-3xl font-bold text-white text-center">Enjoy Big Discounts in Our Mid-Year Deals</h1>
             </div>
         </div>
     </section>

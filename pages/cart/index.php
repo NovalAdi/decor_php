@@ -15,7 +15,7 @@ if ($result) {
     }
 }
 
-if (isset($_POST['btnCheckOut'])) {
+if (isset($_POST['btnCheckOut']) && $_POST['products']) {
     $_SESSION['checkout'] = $_POST['products'];
     header("Location: ../checkout");
 }

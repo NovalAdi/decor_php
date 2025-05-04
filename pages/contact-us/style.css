@@ -1,0 +1,5 @@
+.leaflet-container {
+    z-index: 0 !important; /* Force it below other elements */
+    position: relative; /* Ensure proper stacking */
+    background-color: #d18847;
+}
