@@ -8,12 +8,10 @@ $result = mysqli_query($conn, $sql);
 if ($result) {
     $data = mysqli_fetch_all($result, MYSQLI_ASSOC);
     $_SESSION['data'] = [];
-    $fsd;
     foreach ($data as $key => $value) {
-        if ($value['id_pesanan'] != '') {
+        if ($value['id_pesanan'] == '') {
             $_SESSION['data'][] = $value;
         }
-        $fsd = $value['id_pesanan'];
     }
 }
 ?>
@@ -30,7 +28,6 @@ if ($result) {
         rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://kit.fontawesome.com/42b1412344.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="/home/style.css">
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -47,14 +44,14 @@ if ($result) {
 
     <?php include "../../components/nav.php"; ?>
 
-    <form method="POST" action="../checkout/">
-        <section class="flex justify-center my-32">
+    <form method="POST" action="../checkout/" class="my-32">
+        <section class="flex justify-center">
             <table class="w-[95%]">
                 <thead align="left" class="bg-gray-100">
                     <th class="py-3 pl-3">PRODUCT</th>
                     <th>PRICE</th>
                     <th>QUANTITY</th>
-                    <th>TOTAL <?= var_dump($fsd) ?></th>
+                    <th>TOTAL</th>
                     <th></th>
                 </thead>
                 <tbody>
