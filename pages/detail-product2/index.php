@@ -20,7 +20,6 @@ if ($result) {
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="style.css">
-	<link rel="stylesheet" href="/home/style.css">
 	<link
 		href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
 		rel="stylesheet">
@@ -85,17 +84,16 @@ if ($result) {
 				<div class="checkout-sect">
 					<h1>Atur Jumlah</h1>
 					<div class="stock">
-						<h2>Lemari kamar tidur</h2>
-						<h5>Quantity</h5>
+						<h5 class="mt-2">Quantity</h5>
 					</div>
-					<div class="add flex1">
-						<span>-</span>
-						<label for="">1</label>
-						<span>+</span>
+					<div class="flex gap-2 mb-5 mt-2">
+						<button class="w-[30px] p-1 border rounded-full border-1 text-center hover:bg-gray-200" onclick="minusCounter()">-</button>
+						<input class="py-1 px-2 border rounded-full border-1 w-[50px] text-center bg-white" id="counter" type="text" disabled value="1" min="1">
+						<button class="w-[30px] p-1 border rounded-full border-1 text-center hover:bg-gray-200" onclick="addCounter()">+</button>
 					</div>
 					<div class="total">
 						<p id="total">Total</p>
-						<p id="harga">Rp.100.000.00</p>
+						<input type="text" class="text-end" id="harga" disabled value="Rp.<?= number_format($_SESSION['product']['harga'], 0, ',', '.') ?>">
 					</div>
 					<button class="btn">Add To Cart</button>
 				</div>
