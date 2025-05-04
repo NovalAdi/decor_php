@@ -6,26 +6,15 @@ $sql = "SELECT c.id, p.nama, p.gambar, p.harga, c.quantity, c.id_pesanan FROM ca
 $result = mysqli_query($conn, $sql);
 
 if ($result) {
-    $_SESSION['data'] = mysqli_fetch_all($result, MYSQLI_ASSOC);
-}
-
-if (isset($_POST['btnCheckOut']) && $_POST['products']) {
-    $products = $_POST['products'];
-
-    $sql = "INSERT INTO `pesanan` (`id`, `id_user`, `status`, `created_at`, `updated_at`) VALUES (NULL, " . $_SESSION['id_user'] . ", 'Dikemas', current_timestamp(), current_timestamp());";
-
-    $result = mysqli_query($conn, $sql);
-    if ($result) {
-        $id_pesanan = mysqli_insert_id($conn);
-
-        foreach ($products as $key => $value) {
-            $sqlUpdate = "UPDATE `cart` SET `id_pesanan` = '$id_pesanan' WHERE `cart`.`id` = $value";
-            $result = mysqli_query($conn, $sqlUpdate);
+    $data = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    $_SESSION['data'] = [];
+    $fsd;
+    foreach ($data as $key => $value) {
+        if ($value['id_pesanan'] != '') {
+            $_SESSION['data'][] = $value;
         }
+        $fsd = $value['id_pesanan'];
     }
-    unset($_POST);
-
-    header('Location: ../checkout');
 }
 ?>
 
@@ -58,19 +47,19 @@ if (isset($_POST['btnCheckOut']) && $_POST['products']) {
 
     <?php include "../../components/nav.php"; ?>
 
-    <form method="POST">
-        <section class="flex justify-center mt-32">
+    <form method="POST" action="../checkout/">
+        <section class="flex justify-center my-32">
             <table class="w-[95%]">
                 <thead align="left" class="bg-gray-100">
                     <th class="py-3 pl-3">PRODUCT</th>
                     <th>PRICE</th>
                     <th>QUANTITY</th>
-                    <th>TOTAL</th>
+                    <th>TOTAL <?= var_dump($fsd) ?></th>
                     <th></th>
                 </thead>
                 <tbody>
-                    <?php foreach ($_SESSION['data'] as $key => $data) {
-                        if ($data['id_pesanan'] == '') { ?>
+                    <?php if (count($_SESSION['data']) != 0) {
+                        foreach ($_SESSION['data'] as $key => $data) { ?>
                             <tr class="h-[90px] item-cart <?= $key % 2 == 0 ? 'bg-gray-50' : 'bg-gray-100' ?>">
                                 <td>
                                     <div class="flex items-center gap-3 pl-3">
@@ -97,19 +86,27 @@ if (isset($_POST['btnCheckOut']) && $_POST['products']) {
                                     <a href="">X</a>
                                 </td>
                             </tr>
-                    <?php }
-                    } ?>
+                        <?php }
+                    } else { ?>
+                        <tr class="h-[90px] item-cart bg-gray-50">
+                            <td colspan="5">
+                                <h1 style="text-align: center;">Cart is Empty</h1>
+                            </td>
+                        </tr>
+                    <?php } ?>
                 </tbody>
             </table>
         </section>
-        <section class="flex justify-center mt-7 mb-32">
-            <div class="flex justify-between w-[95%]">
-                <button class="px-20 py-2 text-[#B5733A] font-medium rounded-full border-2 border-[#B5733A]">Use Promo
-                    Code</button>
-                <input class="px-20 py-2 text-white font-medium rounded-full bg-[#B5733A] border-2 border-[#B5733A]"
-                    value="CheckOut" name="btnCheckOut" type="submit">
-            </div>
-        </section>
+        <?php if (count($_SESSION['data']) != 0) { ?>
+            <section class="flex justify-center mt-7">
+                <div class="flex justify-between w-[95%]">
+                    <button class="px-20 py-2 text-[#B5733A] font-medium rounded-full border-2 border-[#B5733A]">Use Promo
+                        Code</button>
+                    <input class="px-20 py-2 text-white font-medium rounded-full bg-[#B5733A] border-2 border-[#B5733A]"
+                        value="CheckOut" name="btnCheckOut" type="submit">
+                </div>
+            </section>
+        <?php } ?>
     </form>
 
     <?php include "../../components/footer.php" ?>

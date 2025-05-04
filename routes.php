@@ -6,8 +6,12 @@ $routes = $_SESSION['role'] == 'admin' ? [
         'path' => '../admin/',
     ],
     [
-        'name' => 'Products',
+        'name' => 'Produk',
         'path' => '../admin/products/',
+    ],
+    [
+        'name' => 'Pesanan',
+        'path' => '../admin/pesanan/',
     ],
 ] : [
     [
