@@ -6,10 +6,12 @@ $sql = "SELECT p.id, p.nama, p.gambar, p.harga, p.rating, GROUP_CONCAT(t.nama) A
 
 $conditions = [];
 
-$_SESSION['tag_filter'] = $_POST['tags'];
-$_SESSION['rating_filter'] = $_POST['ratings'];
-$_SESSION['price_from'] = $_POST['price_from'];
-$_SESSION['price_to'] = $_POST['price_to'];
+if (isset($_POST['btnFilter'])) {
+    $_SESSION['tag_filter'] = $_POST['tags'];
+    $_SESSION['rating_filter'] = $_POST['ratings'];
+    $_SESSION['price_from'] = $_POST['price_from'];
+    $_SESSION['price_to'] = $_POST['price_to'];
+}
 
 if (isset($_SESSION['tag_filter'])) {
     $tags = array_map(function ($tag) {

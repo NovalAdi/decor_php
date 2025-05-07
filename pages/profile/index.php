@@ -33,8 +33,8 @@ session_start();
 	<?php include "../../components/nav.php"; ?>
 
 	<!-- Tambahkan ini di bagian <body> -->
-	<div class="container">
-		<div class="left">
+	<div class="container my-20 mx-auto">
+		<div class="left w-auto">
 			<div class="profile-container">
 				<img id="profilePreview" src="../../img/default_pp.png" class="profile-img" />
 				<label for="uploadInput" class="upload-btn">Pilih Foto</label>
@@ -111,7 +111,7 @@ session_start();
 	</div>
 
 	<?php include "../../components/footer.php" ?>
-	
+
 	<script src="script.js"></script>
 </body>
 
