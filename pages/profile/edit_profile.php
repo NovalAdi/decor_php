@@ -15,10 +15,10 @@ $result = $stmt->get_result();
 
 //memerikasa apakah ada hasil dari query
 if ($result->num_rows > 0) {
-  $user = $result->fetch_assoc();
+    $user = $result->fetch_assoc();
 } else {
-  echo "User not found.";
-  exit;
+    echo "User not found.";
+    exit;
 }
 
 //mengecek jika halaman ini menerima permintaan POST dari form
@@ -50,7 +50,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } else {
         echo "Error updating profile: " . mysqli_error($conn);
     }
-    
 }
 
 ?>
@@ -62,6 +61,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Edit Profil</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://kit.fontawesome.com/42b1412344.js" crossorigin="anonymous"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                fontFamily: {
+                    'sans': ["Poppins", 'sans-serif'],
+                },
+            }
+        }
+    </script>
     <style>
         :root {
             --primary-color: #b5733a;
@@ -152,7 +166,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 </head>
 
 <body>
-    <div class="container">
+
+    <?php include "../../components/nav.php"; ?>
+
+    <div class="container mt-24">
         <h2>Edit Profile</h2>
 
         <?php if (isset($_GET['success'])): ?>
@@ -198,16 +215,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </form>
     </div>
 
+    <?php include "../../components/footer.php" ?>
+
     <script>
         // Preview foto profil
         const profilePicInput = document.getElementById("profilePicInput");
         const preview = document.getElementById("preview");
 
-        profilePicInput.addEventListener("change", function () {
+        profilePicInput.addEventListener("change", function() {
             const file = this.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function (e) {
+                reader.onload = function(e) {
                     preview.src = e.target.result;
                 };
                 reader.readAsDataURL(file);

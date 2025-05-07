@@ -26,15 +26,32 @@ if ($result->num_rows > 0) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Halaman Profil</title>
   <link rel="stylesheet" href="style.css" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://kit.fontawesome.com/42b1412344.js" crossorigin="anonymous"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        fontFamily: {
+          'sans': ["Poppins", 'sans-serif'],
+        },
+      }
+    }
+  </script>
 </head>
 
 <body>
 
+  <?php include "../../components/nav.php"; ?>
+
   <!-- Tambahkan ini di bagian <body> -->
-  <div class="container">
+  <div class="container mt-24">
     <div class="left">
       <div class="profile-container">
-        <img id="profilePreview" src="../../img/<?= $user['gambar'] ? "upload/".$user['gambar'] : "default_pp.png"?>" class="profile-img" />
+        <img id="profilePreview" src="../../img/<?= $user['gambar'] ? "upload/" . $user['gambar'] : "default_pp.png" ?>" class="profile-img" />
         <h3x`>Profile Picture</h3x>
       </div>
     </div>
@@ -62,7 +79,7 @@ if ($result->num_rows > 0) {
         <div class="section">
           <h3 style="color: #b5733a;">Daftar Alamat</h3>
           <div class="info-row">
-            <p><span style="font-weight: bold">Alamat Utama</span>: <?= htmlspecialchars($user['alamat'])?></p>
+            <p><span style="font-weight: bold">Alamat Utama</span>: <?= htmlspecialchars($user['alamat']) ?></p>
           </div>
         </div>
       </div>
@@ -71,6 +88,8 @@ if ($result->num_rows > 0) {
       </div>
     </div>
   </div>
+
+  <?php include "../../components/footer.php" ?>
 
   <script>
     function showTab(tabId) {
