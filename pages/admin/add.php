@@ -35,7 +35,7 @@ if (isset($_POST['submit'])) {
         echo "Semua kolom harus diisi.";
     } else {
         // Query untuk menambahkan produk ke database
-        $sql = "INSERT INTO produk (nama, harga, desk, stok, gambar, rating) VALUES ('$nama', '$harga', '$desk', '$stok', '$foto', '$rating')";
+        $sql = "INSERT INTO produk (nama, harga, desk, stok, gambar, rating) VALUES ('$nama', '$harga', '$desk', '$rating', '$foto', '$stok')";
         if (mysqli_query($conn, $sql)) {
             header("Location: index.php"); // Redirect ke halaman daftar produk setelah berhasil tambah
         } else {
@@ -74,7 +74,7 @@ if (isset($_POST['submit'])) {
 
             <label class="block">
                 <span class="text-gray-700">Description</span>
-                <textarea name="desk" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required></textarea>
+                <input type="text" name="desk" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
             </label>
 
             <label class="block">

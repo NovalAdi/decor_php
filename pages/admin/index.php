@@ -1,6 +1,6 @@
 <?php
-include "../../config.php";
-session_start();
+include "../../config.php"; //untuk mengimpor file konfigurasi yang berisi koneksi ke database ($conn)
+session_start(); //menyimpan data login user serta mengakses variabel global
 ?>
 
 <!DOCTYPE html>
@@ -30,7 +30,7 @@ session_start();
 
 <body class="font-sans">
 
-    <?php include "../../components/nav.php"; ?>
+    <?php include "../../components/nav.php"; //untuk tampilan navbar agar konsisten di halaman admin ?>
 
     <section class="flex flex-col mt-24 mx-20">
         <style>
@@ -57,14 +57,15 @@ session_start();
             </thead>
             <tbody>
                 <?php
-                $sql = "SELECT p.id, p.nama, p.desk, p.gambar, p.harga, p.rating, p.stok, GROUP_CONCAT(t.nama) AS tags FROM produk p LEFT JOIN produk_tag pt ON p.id = pt.id_produk LEFT JOIN tag t ON pt.id_tag = t.id GROUP BY p.id, p.nama, p.desk, p.harga, p.rating";
-                $result = mysqli_query($conn, $sql);
+                $sql = "SELECT * FROM produk"; //memilih semua kolom tabel tabel produk
+                $result = mysqli_query($conn, $sql); //untuk melakukan checking apakah sql sudah berjalan atau belum 
                 while ($row = mysqli_fetch_assoc($result)) {
+                    //menampilkan baris tabel untuk setiap produk , melooping sesuai panjang data base 
                     echo "<tr>";
                     echo "<td class='border px-4 py-2 text-center'><img class='object-cover w-[60px] h-[60px] rounded-lg' src='../../img/upload/" . $row['gambar'] . "' alt=''></td>";
                     echo "<td class='border px-4 py-2'>" . $row['nama'] . "</td>";
                     echo "<td class='border px-4 py-2 text-center'>Rp." . number_format($row['harga'], 0, ',', '.') . "</td>";
-                    echo "<td class='border px-4 py-2 max-w-[250px] truncate'>" . $row['desk'] . "</td>";
+                    echo "<td class='border px-4 py-2'>" . $row['desk'] . "</td>";
                     echo "<td class='border px-4 py-2'>" . $row['rating'] . "</td>";
                     echo "<td class='border px-4 py-2'>" . $row['stok'] . "</td>";
                     echo "<td class='border px-4 py-2 text-center'>
