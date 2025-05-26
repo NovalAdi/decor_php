@@ -8,14 +8,14 @@ if (isset($_POST['btnSubmit'])) {
 
     $phash = password_hash($password, PASSWORD_DEFAULT);
 
-    $sql = "INSERT INTO `user` (`id`, `username`, `email`, `password`, `role`) VALUES (NULL, '$username', '$email', '$phash', 'customer');";
-    
+    $sql = "INSERT INTO `user` (`id`, `username`, `email`, `password`, `role`, `nama_lengkap`, `gender`, `gambar`) VALUES (NULL, '$username', '$email', '$phash', 'customer', NULL, NULL, NULL);";
+
     $query = mysqli_query($conn, $sql);
 
     if ($query) {
         header("Location: ../signin/");
     } else {
-        echo "Registration failed!";
+        echo password_hash('123', PASSWORD_DEFAULT);
     }
     mysqli_close($conn);
 }
@@ -35,7 +35,7 @@ if (isset($_POST['btnSubmit'])) {
 
 <body class=" h-[100vh] w-[100vw] bg-[#F0E7E1]">
     <div class="flex justify-evenly items-center h-full">
-        <form method="post" class="w-[30vw] flex flex-col gap-10"> 
+        <form method="post" class="w-[30vw] flex flex-col gap-10">
             <img src="../../img/logo-decor.svg" alt="" width="200px">
             <div>
                 <div class="flex flex-col gap-2">

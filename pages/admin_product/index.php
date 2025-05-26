@@ -30,7 +30,8 @@ session_start(); //menyimpan data login user serta mengakses variabel global
 
 <body class="font-sans">
 
-    <?php include "../../components/nav.php"; //untuk tampilan navbar agar konsisten di halaman admin ?>
+    <?php include "../../components/nav.php"; //untuk tampilan navbar agar konsisten di halaman admin 
+    ?>
 
     <section class="flex flex-col mt-24 mx-20">
         <style>
@@ -40,10 +41,13 @@ session_start(); //menyimpan data login user serta mengakses variabel global
         </style>
         <h1 class="text-3xl font-bold section-title">Your Products</h1>
 
+        <div class="w-[95%] flex justify-start">
+            <a href="add.php" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
+                + Add Product
+            </a>
+        </div>
 
-
-
-        <table class="table-fixed">
+        <table class="table-fixed mt-5">
             <thead>
                 <tr>
                     <th class="border px-4 py-2 text-white" style="background-color: #B5733A;">Image</th>
@@ -57,7 +61,7 @@ session_start(); //menyimpan data login user serta mengakses variabel global
             </thead>
             <tbody>
                 <?php
-                $sql = "SELECT * FROM produk"; //memilih semua kolom tabel tabel produk
+                $sql = "SELECT f.id, f.nama, f.deskripsi, f.stock, f.harga, g.gambar, IFNULL(ROUND(AVG(r.rate), 1), 0.0) AS rating FROM furniture f join furniture_gambar g on f.gambar_utama = g.id LEFT JOIN review_furniture rf ON f.id = rf.furniture_id LEFT JOIN review r ON rf.review_id = r.id LEFT JOIN furniture_tag ft ON f.id = ft.furniture_id GROUP BY f.id, f.nama, f.harga"; //memilih semua kolom tabel tabel produk
                 $result = mysqli_query($conn, $sql); //untuk melakukan checking apakah sql sudah berjalan atau belum 
                 while ($row = mysqli_fetch_assoc($result)) {
                     //menampilkan baris tabel untuk setiap produk , melooping sesuai panjang data base 
@@ -65,9 +69,9 @@ session_start(); //menyimpan data login user serta mengakses variabel global
                     echo "<td class='border px-4 py-2 text-center'><img class='object-cover w-[60px] h-[60px] rounded-lg' src='../../img/upload/" . $row['gambar'] . "' alt=''></td>";
                     echo "<td class='border px-4 py-2'>" . $row['nama'] . "</td>";
                     echo "<td class='border px-4 py-2 text-center'>Rp." . number_format($row['harga'], 0, ',', '.') . "</td>";
-                    echo "<td class='border px-4 py-2'>" . $row['desk'] . "</td>";
+                    echo "<td class='border px-4 py-2 whitespace-nowrap overflow-hidden text-ellipsis max-w-[500px]'>" . $row['deskripsi'] . "</td>";
                     echo "<td class='border px-4 py-2'>" . $row['rating'] . "</td>";
-                    echo "<td class='border px-4 py-2'>" . $row['stok'] . "</td>";
+                    echo "<td class='border px-4 py-2'>" . $row['stock'] . "</td>";
                     echo "<td class='border px-4 py-2 text-center'>
                         <a href='edit.php?id=" . $row['id'] . "' class='text-blue-700'>Edit</a> |
                         <a href='delete.php?id=" . $row['id'] . "' class='text-red-700'>Delete</a>
@@ -77,11 +81,6 @@ session_start(); //menyimpan data login user serta mengakses variabel global
                 ?>
             </tbody>
         </table>
-
-        <!-- Tombol Add Product di bawah tabel -->
-        <div class="mt-4 flex justify-end">
-            <a href="add.php" class="text-black-500 underline hover:text-orange-500">Add Product</a>
-        </div>
     </section>
 
     <script src="../home/script.js"></script>

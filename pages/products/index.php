@@ -2,15 +2,20 @@
 include "../../config.php";
 session_start();
 
-$sql = "SELECT p.id, p.nama, p.gambar, p.harga, p.rating, GROUP_CONCAT(t.nama) AS tags FROM produk p LEFT JOIN produk_tag pt ON p.id = pt.id_produk LEFT JOIN tag t ON pt.id_tag = t.id ";
+$sql = "SELECT f.id, f.nama, f.harga, g.gambar, IFNULL(ROUND(AVG(r.rate), 1), 0.0) AS rating, GROUP_CONCAT(DISTINCT t.nama SEPARATOR ', ') AS tag FROM furniture f join furniture_gambar g on f.gambar_utama = g.id LEFT JOIN review_furniture rf ON f.id = rf.furniture_id LEFT JOIN review r ON rf.review_id = r.id LEFT JOIN furniture_tag ft ON f.id = ft.furniture_id LEFT JOIN tag t ON ft.tag_id = t.id ";
 
 $conditions = [];
+$having = "";
 
-if (isset($_POST['btnFilter'])) {
+if (isset($_POST['btnFilter']) || isset($_POST['sort_by'])) {
     $_SESSION['tag_filter'] = $_POST['tags'];
     $_SESSION['rating_filter'] = $_POST['ratings'];
     $_SESSION['price_from'] = $_POST['price_from'];
     $_SESSION['price_to'] = $_POST['price_to'];
+}
+
+if (isset($_POST['sort_by'])) {
+    $_SESSION['sort_by'] = $_POST['sort_by'];
 }
 
 if (isset($_SESSION['tag_filter'])) {
@@ -22,23 +27,23 @@ if (isset($_SESSION['tag_filter'])) {
 }
 
 if (isset($_SESSION['rating_filter'])) {
-    $conditions[] = "FLOOR(p.rating) IN (" . implode(',', $_SESSION['rating_filter']) . ")";
+    $having = "HAVING FLOOR(rating) IN (" . implode(',', $_SESSION['rating_filter']) . ")";
 }
 
 if (isset($_SESSION['search_query'])) {
-    $conditions[] = "p.nama LIKE '%" . $_SESSION['search_query'] . "%'";
+    $conditions[] = "f.nama LIKE '%" . $_SESSION['search_query'] . "%'";
 }
 
 $price_conditions = [];
 
 if (!empty($_SESSION['price_from'])) {
     $price_from = intval($_SESSION['price_from']);
-    $price_conditions[] = "p.harga >= $price_from";
+    $price_conditions[] = "f.harga >= $price_from";
 }
 
 if (!empty($_SESSION['price_to'])) {
     $price_to = intval($_SESSION['price_to']);
-    $price_conditions[] = "p.harga <= $price_to";
+    $price_conditions[] = "f.harga <= $price_to";
 }
 
 if (!empty($price_conditions)) {
@@ -49,7 +54,29 @@ if (count($conditions) != 0) {
     $sql .= "WHERE " . implode(' AND ', $conditions) . "";
 }
 
-$sql .= " GROUP BY p.id, p.nama, p.desk, p.harga, p.rating";
+$sql .= " GROUP BY f.id, f.nama, f.harga ";
+
+if (!empty($having)) {
+    $sql .= $having . " ";
+}
+
+if (isset($_SESSION['sort_by'])) {
+    switch ($_SESSION['sort_by']) {
+        case 'price_asc':
+            $sql .= " ORDER BY f.harga ASC";
+            break;
+        case 'price_desc':
+            $sql .= " ORDER BY f.harga DESC";
+            break;
+        case 'rating_asc':
+            $sql .= " ORDER BY f.rating ASC";
+            break;
+        case 'rating_desc':
+            $sql .= " ORDER BY f.rating DESC";
+            break;
+    }
+}
+
 $sqltag = "SELECT * FROM tag";
 
 $result = mysqli_query($conn, $sql);
@@ -58,9 +85,10 @@ $resultTag = mysqli_query($conn, $sqltag);
 $rowTag = mysqli_fetch_all($resultTag, MYSQLI_ASSOC);
 
 $_SESSION['products'] = empty($row) ? [] : $row;
+for ($i = 0; $i < 50; $i++) {
+    $_SESSION['products'][] = $rows[0];
+}
 $_SESSION['tags'] = empty($rowTag) ? [] : $rowTag;
-
-
 
 ?>
 <!DOCTYPE html>
@@ -101,6 +129,7 @@ $_SESSION['tags'] = empty($rowTag) ? [] : $rowTag;
         <aside class="flex flex-col py-10 px-6 gap-3 drop-shadow-md bg-white ml-14 mr-7 rounded-xl border border-[1px] border-gray-200 h-min">
             <form method="post">
                 <h1 class="text-2xl font-medium mb-2">Filter</h1>
+                <!-- tags -->
                 <div>
                     <h1 class="font-medium">Tags</h1>
                     <div class="ml-2 text-gray-700 mt-3 flex flex-wrap gap-y-3 gap-x-2">
@@ -123,6 +152,7 @@ $_SESSION['tags'] = empty($rowTag) ? [] : $rowTag;
                         <?php } ?>
                     </div>
                 </div>
+                <!-- rating  -->
                 <div class="mt-3">
                     <h1 class="font-medium">Rating</h1>
                     <div class="ml-2 text-gray-700 mt-3 flex flex-col gap-1">
@@ -144,6 +174,7 @@ $_SESSION['tags'] = empty($rowTag) ? [] : $rowTag;
                         <?php } ?>
                     </div>
                 </div>
+                <!-- price  -->
                 <div class="flex flex-col gap-3 mt-3">
                     <h1 class="font-medium">Filter by Price</h1>
                     <div class="flex">
@@ -163,32 +194,39 @@ $_SESSION['tags'] = empty($rowTag) ? [] : $rowTag;
             </form>
         </aside>
 
-
-
         <main class="col-span-3 mr-14">
 
             <!-- sort -->
             <div class="flex justify-between items-center">
                 <h1 class="text-xl font-medium">Show <?= count($_SESSION['products']) ?> products</h1>
-                <div class="flex items-center gap-3">
+                <form method="post" class="flex items-center gap-3">
                     <p>Sort by</p>
-                    <select class="px-2 py-1 border border-[1.5px] border-gray-400 rounded-lg text-sm">
-                        <option value="">Price</option>
-                        <option value="">Rating</option>
+                    <select name="sort_by" onchange="this.form.submit()" class="px-2 py-1 border border-[1.5px] border-gray-400 rounded-lg text-sm">
+                        <option value="" <?= !isset($_SESSION['sort_by']) ? 'selected' : '' ?>>Select</option>
+                        <option value="price_asc" <?= (isset($_SESSION['sort_by']) && $_SESSION['sort_by'] == 'price_asc') ? 'selected' : '' ?>>Price low to high</option>
+                        <option value="price_desc" <?= (isset($_SESSION['sort_by']) && $_SESSION['sort_by'] == 'price_desc') ? 'selected' : '' ?>>Price high to low</option>
+                        <option value="rating_asc" <?= (isset($_SESSION['sort_by']) && $_SESSION['sort_by'] == 'rating_asc') ? 'selected' : '' ?>>Rating low to high</option>
+                        <option value="rating_desc" <?= (isset($_SESSION['sort_by']) && $_SESSION['sort_by'] == 'rating_desc') ? 'selected' : '' ?>>Rating high to low</option>
                     </select>
-                </div>
+                </form>
+
             </div>
 
             <!-- list -->
             <section class=" grid grid-cols-4 gap-3 mt-5">
                 <?php
-                foreach ($_SESSION['products'] as $product) { ?>
+                foreach ($_SESSION['products'] as $key => $product) {
+                    $list = isset($_GET['list']) ? $_GET['list'] : 1;
+                    if ($list != 1 && $key < ($list - 1) * 12) {
+                        continue;
+                    } elseif ($list != 1 && $key >= $list * 12) {
+                        continue;
+                    } elseif ($list == 1 && $key >= 12) {
+                        break;
+                    } ?>
                     <a class="bg-white hover:bg-gray-50 overflow-hidden flex flex-col gap-3 rounded-lg" href="../detail-product2/?id=<?= $product['id'] ?>">
                         <div class="relative">
-                            <img class="bg-gray-200 h-[250px] object-contain" src="../../img/upload/<?= $product['gambar'] ?>" alt="">
-                            <div class="flex gap-2 items-center absolute left-2 bottom-2">
-                                <img src="/img/ikea.svg" class="w-[40px]" alt="">
-                            </div>
+                            <img class="bg-gray-200 h-[250px] object-cover" src="../../img/upload/<?= $product['gambar'] ?>" alt="">
                         </div>
                         <div class="flex flex-col justify-between gap-2 h-full px-4 pb-2">
                             <div>
@@ -207,21 +245,24 @@ $_SESSION['tags'] = empty($rowTag) ? [] : $rowTag;
             <!-- pagination -->
             <div class="flex gap-14 items-center text-lg mt-10 justify-center">
                 <div class="flex gap-5">
-                    <a href=""><i class="fa-solid fa-angles-left"></i></a>
-                    <a href=""><i class="fa-solid fa-angle-left"></i></a>
+                    <a href="?list=1"><i class="fa-solid fa-angles-left"></i></a>
+                    <a href="?list=<?= isset($_GET['list']) && $_GET['list'] > 1 ? $_GET['list'] - 1 : 1 ?>"><i class="fa-solid fa-angle-left"></i></a>
                 </div>
                 <div class="flex gap-3">
-                    <a href="" class="underline underline-offset-8">1</a>
-                    <a href="">2</a>
-                    <a href="">3</a>
-                    <a href="">4</a>
-                    <a href="">5</a>
-                    <a href="">...</a>
-                    <a href="">25</a>
+                    <?php
+                    $page = count($_SESSION['products']) % 12 == 0 ? count($_SESSION['products']) / 12 : floor(count($_SESSION['products']) / 12 + 1);
+                    for ($i = 1; $i <= $page; $i++) {
+                        $active = (isset($_GET['list']) && $_GET['list'] == $i) ? 'active' : '';
+                        if ($active == 'active' || (!isset($_GET['list']) && $i == 1)) { ?>
+                            <a href="?list=<?= $i ?>" class="underline underline-offset-8"><?= $i ?></a>
+                        <?php } else { ?>
+                            <a href="?list=<?= $i ?>"><?= $i ?></a>
+                    <?php }
+                    } ?>
                 </div>
                 <div class="flex gap-5">
-                    <a href=""><i class="fa-solid fa-angle-right"></i></a>
-                    <a href=""><i class="fa-solid fa-angles-right"></i></a>
+                    <a href="?list=<?= isset($_GET['list']) && $_GET['list'] < floor(count($_SESSION['products']) / 12 + 1) ? $_GET['list'] + 1 : floor(count($_SESSION['products']) / 12 + 1) ?>"><i class="fa-solid fa-angle-right"></i></a>
+                    <a href="?list=<?= floor(count($_SESSION['products']) / 12 + 1) ?>"><i class="fa-solid fa-angles-right"></i></a>
                 </div>
             </div>
         </main>

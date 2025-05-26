@@ -11,11 +11,12 @@ if (isset($_POST['btnSubmit'])) {
     if ($row) {
         if (password_verify($password, $row['password'])) {
             session_start();
+            $_SESSION = [];
             $_SESSION['username'] = $username;
             $_SESSION['role'] = $row['role'];
             $_SESSION['id_user'] = $row['id'];
             if ($row['role'] == 'admin') {
-                header("Location: ../admin/");
+                header("Location: ../admin_product/");
             } else {
                 header("Location: ../home/");
             }

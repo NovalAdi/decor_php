@@ -2,7 +2,7 @@
 include "../../config.php";
 session_start();
 
-$sql = "SELECT p.id, p.nama, p.gambar, p.harga, p.rating, p.stok, GROUP_CONCAT(t.nama) AS tags FROM produk p LEFT JOIN produk_tag pt ON p.id = pt.id_produk LEFT JOIN tag t ON pt.id_tag = t.id GROUP BY p.id, p.nama, p.desk, p.harga, p.rating";
+$sql = "SELECT f.id, f.nama, f.stock, f.harga, g.gambar, IFNULL(ROUND(AVG(r.rate), 1), 0.0) AS rating, GROUP_CONCAT(DISTINCT t.nama SEPARATOR ', ') AS tags FROM furniture f join furniture_gambar g on f.gambar_utama = g.id LEFT JOIN review_furniture rf ON f.id = rf.furniture_id LEFT JOIN review r ON rf.review_id = r.id LEFT JOIN furniture_tag ft ON f.id = ft.furniture_id LEFT JOIN tag t ON ft.tag_id = t.id GROUP BY f.id, f.nama, f.harga";
 
 $result = mysqli_query($conn, $sql);
 
@@ -71,7 +71,7 @@ if ($result) {
                                 <td>
                                     <p>Rp.<?= number_format($data['harga'], 0, ',', '.') ?></p>
                                 </td>
-                                <td>
+                                <td class="max-w-[250px]">
                                     <div class="flex flex-wrap gap-2 max-w-96">
                                         <?php
                                         $tags = explode(',', $data['tags']);
@@ -84,7 +84,7 @@ if ($result) {
                                     <p class="flex gap-2 items-center"><img class="w-[15px] h-[15px]" src="../../img/star.png" alt=""><?= $data['rating'] ?></p>
                                 </td>
                                 <td>
-                                    <p><?= $data['stok'] ?></p>
+                                    <p><?= $data['stock'] ?></p>
                                 </td>
                                 <td>
                                     <div class="flex justify-center items-center gap-2 mr-4">
@@ -104,6 +104,7 @@ if ($result) {
         </div>
     </section>
 
+    <?php include "../../components/footer.php" ?>
 </body>
 
 </html>

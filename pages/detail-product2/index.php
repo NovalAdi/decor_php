@@ -3,7 +3,7 @@ include "../../config.php";
 session_start();
 
 $id = $_GET['id'];
-$sql = "SELECT p.id, p.nama, p.desk, p.gambar, p.harga, p.rating, GROUP_CONCAT(t.nama) AS tags FROM produk p LEFT JOIN produk_tag pt ON p.id = pt.id_produk LEFT JOIN tag t ON pt.id_tag = t.id WHERE p.id='$id' GROUP BY p.id, p.nama, p.desk, p.harga, p.rating;";
+$sql = "SELECT f.nama, f.deskripsi, f.harga, IFNULL(ROUND(AVG(r.rate), 1), 0.0) AS rating, GROUP_CONCAT(DISTINCT t.nama SEPARATOR ', ') AS tag, GROUP_CONCAT(DISTINCT g.gambar SEPARATOR ', ') as gambar FROM furniture f join furniture_gambar g on f.id = g.furniture_id LEFT JOIN review_furniture rf ON f.id = rf.furniture_id LEFT JOIN review r ON rf.review_id = r.id LEFT JOIN furniture_tag ft ON f.id = ft.furniture_id LEFT JOIN tag t ON ft.tag_id = t.id WHERE f.id = $id GROUP BY f.id, f.nama, f.harga";
 
 $result = mysqli_query($conn, $sql);
 
@@ -20,6 +20,8 @@ if (isset($_POST['btnAddToCart'])) {
 		header("Location: ../cart");
 	}
 }
+
+$_SESSION['product']['gambar'] = array_map('trim', explode(',', $_SESSION['product']['gambar']));
 ?>
 
 <!DOCTYPE html>
@@ -57,7 +59,12 @@ if (isset($_POST['btnAddToCart'])) {
 			<div class="box flexx">
 				<div class="left">
 					<div class="main-img">
-						<img src="../../img/upload/<?= $_SESSION['product']['gambar'] ?>" alt="" class="slide" style="width: 450px; height: 300px; object-fit: cover;">
+						<img src="../../img/upload/<?= $_SESSION['product']['gambar'][0] ?>" id="mainImage" alt="" class="slide" style="width: 450px; height: 300px; object-fit: cover;">
+					</div>
+					<div class="thumbnail-container" style="display: flex; gap: 15px; margin-top: 10px; cursor: pointer;">
+						<?php foreach ($_SESSION['product']['gambar'] as $key => $value) { ?>
+							<img src="../../img/upload/<?= $value ?>" class="thumbnail" alt="" class="slide" style="width: 80px; height: 80px; object-fit: cover; ">
+						<?php } ?>
 					</div>
 				</div>
 				<div class="right">
@@ -75,7 +82,7 @@ if (isset($_POST['btnAddToCart'])) {
 							<h1 id="price">Rp.<?= number_format($_SESSION['product']['harga'], 0, ',', '.') ?></h1>
 						</div>
 						<div class="detail1">
-							<p id="detail"><?= $_SESSION['product']['desk'] ?></p>
+							<p id="detail"><?= $_SESSION['product']['deskripsi'] ?></p>
 						</div>
 					</div>
 				</div>
@@ -150,6 +157,15 @@ if (isset($_POST['btnAddToCart'])) {
 				updateHarga();
 			}
 		}
+
+		const mainImage = document.getElementById("mainImage");
+		const thumbnails = document.querySelectorAll(".thumbnail");
+
+		thumbnails.forEach(thumbnail => {
+			thumbnail.addEventListener('click', function() {
+				mainImage.src = thumbnail.src;
+			});
+		});
 	</script>
 </body>
 

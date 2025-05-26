@@ -1,9 +1,10 @@
 <?php
+session_start();
 $host = "localhost";
 $user = "root";
 $password = "";
 
-$dbname = "db_decor";
+$dbname = "decor_db";
 $conn = new mysqli($host, $user, $password, $dbname);
 if (!$conn) {
     die(" Koneksi ke MY SQL gagal , silahkan koneksikan kembali ");

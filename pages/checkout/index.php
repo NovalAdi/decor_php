@@ -17,8 +17,6 @@ if (isset($_POST['btnCheckout']) && $_SESSION['checkout']) {
 
     $typeAllowed = ["image/jpeg", "image/png"];
 
-    $targetDir = $_SERVER['DOCUMENT_ROOT'] . "/decor/img/upload/";
-
     if (in_array($fileFoto["type"], $typeAllowed)) {
         if (move_uploaded_file($fileFoto["tmp_name"], "../../img/upload/" . basename($fileFoto["name"]))) {
             $foto = $fileFoto['name'];

@@ -33,17 +33,6 @@
     display: flex;
 }
 
-.option img {
-    width: 125px ;
-    height: 125px;
-    padding: 10px;
-}
-
-.option img:hover {
-    cursor: pointer;
-    opacity: 0.5;
-}
-
 .title {
     color: black;
     font-size: 30px;
