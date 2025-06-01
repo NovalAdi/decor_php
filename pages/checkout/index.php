@@ -2,17 +2,36 @@
 include "../../config.php";
 session_start();
 
-$sql = "SELECT c.id, p.nama, p.gambar, p.harga, c.quantity, c.id_pesanan FROM cart c JOIN produk p ON c.id_produk = p.id JOIN user u ON c.id_user = u.id WHERE u.id = " . $_SESSION['id_user'] . " AND c.id IN(" . implode(',', $_SESSION['checkout']) . ")";
-
-$result = mysqli_query($conn, $sql);
-$foto;
-
-if ($result) {
-    $_SESSION['data_checkout'] = mysqli_fetch_all($result, MYSQLI_ASSOC);
+if (!isset($_SESSION['checkout'])) {
+    header("Location: ../home");
 }
 
-if (isset($_POST['btnCheckout']) && $_SESSION['checkout']) {
-    $products = $_SESSION['checkout'];
+$resultAlamat = mysqli_query($conn, "SELECT id, nama, alamat FROM user_alamat WHERE user_id = " . $_SESSION['id_user']);
+$dataAlamat = mysqli_fetch_all($resultAlamat, MYSQLI_ASSOC);
+
+$sql = "SELECT c.id, f.nama, GROUP_CONCAT(DISTINCT g.gambar SEPARATOR ', ') as gambar, f.harga, c.quantity, f.id FROM cart c JOIN furniture f ON c.furniture_id = f.id JOIN user u ON c.user_id = u.id join furniture_gambar g on f.gambar_utama = g.id WHERE u.id = " . $_SESSION['id_user'] . " AND c.id IN(" . implode(',', $_SESSION['checkout']) . ") GROUP BY f.nama, f.harga";
+
+$result = mysqli_query($conn, $sql);
+
+if ($result) {
+    $dataP = mysqli_fetch_all($result, MYSQLI_ASSOC);
+}
+
+$hargaTotal = 0;
+$totalItem = 0;
+foreach ($dataP as $key => $value) {
+    $hargaTotal += $value['harga'] * $value['quantity'];
+    $totalItem += $value['quantity'];
+}
+
+if (isset($_POST['btnCheckout'])) {
+    $products = $dataP;
+    $products = array_map(function ($item) {
+        return $item['id'];
+    }, $products);
+    $shipping = $_POST['shipping'];
+    $payment = $_POST['payment'];
+    $alamat = $_POST['alamat'];
     $fileFoto = $_FILES['foto'];
 
     $typeAllowed = ["image/jpeg", "image/png"];
@@ -23,19 +42,36 @@ if (isset($_POST['btnCheckout']) && $_SESSION['checkout']) {
         }
     }
 
-    $sql = "INSERT INTO `pesanan` (`id`, `id_user`, `status`, `bukti_pembayaran`, `created_at`, `updated_at`) VALUES (NULL, " . $_SESSION['id_user'] . ", 'Dikemas', '$foto', current_timestamp(), current_timestamp());";
+    $sql = "INSERT INTO `pesanan` (`id`, `user_id`, `alamat`, `status`, `bukti_pembayaran`, `jenis_pengiriman`, `jenis_pembayaran`, `tgl_pesan`) VALUES (NULL, " . $_SESSION['id_user'] . ", $alamat, 'Dikemas', '$foto', '$shipping', '$payment', current_timestamp());";
 
     $result = mysqli_query($conn, $sql);
     if ($result) {
         $id_pesanan = mysqli_insert_id($conn);
 
-        foreach ($products as $key => $value) {
-            $sqlUpdate = "UPDATE `cart` SET `id_pesanan` = '$id_pesanan' WHERE `cart`.`id` = $value";
-            $result = mysqli_query($conn, $sqlUpdate);
+        foreach ($dataP as $key => $value) {
+            $sqlItem = "INSERT INTO `pesanan_item` (`id`, `pesanan_id`, `furniture_id`, `quantity`) VALUES (NULL, $id_pesanan, " . $value['id'] . ", " . $value['quantity'] . ");";
+            $result = mysqli_query($conn, $sqlItem);
+        }
+
+        if ($result) {
+            $sqlDelete = "DELETE FROM cart WHERE id IN (" . implode(',', $_SESSION['checkout']) . ")";
+            $resultDelete = mysqli_query($conn, $sqlDelete);
+
+            foreach ($dataP as $item) {
+                $updateStockSql = "UPDATE furniture SET stock = stock - " . intval($item['quantity']) . " WHERE id = " . intval($item['id']);
+                mysqli_query($conn, $updateStockSql);
+            }
+            
+            if ($resultDelete) {
+                unset($_SESSION['checkout']);
+                header("Location: ../home");
+            } else {
+                echo "Error deleting items from cart.";
+            }
+        } else {
+            echo "Error inserting order items.";
         }
     }
-    unset($_POST);
-    header("Location: ../home");
 }
 ?>
 
@@ -72,36 +108,36 @@ if (isset($_POST['btnCheckout']) && $_SESSION['checkout']) {
     <form method="POST" enctype="multipart/form-data">
         <div class="container mb-16 mt-24">
             <div class="left-section">
-                <div class="section">
-                    <div class="section-title">Shipping Address</div>
-                    <div class="address">
-                        <div class="details">
-                            <p> House • John Doe</p><br>
-                            <p>John Doe, 123 Maple Street, Apt. 4B, Seattle, WA 98101, United Statest</p>
-                            <p>6285872042022</p>
-                        </div>
-                        <button class="btn-ganti">Change</button>
-                    </div>
+                <div class="payment-method">
+                    <div class="section-title">Shipping Address <?= var_dump($sqlItem) ?></div>
+                    <select name="alamat" class="w-full border border-gray-300 rounded px-2 py-2">
+                        <?php foreach ($dataAlamat as $key => $value) { ?>
+                            <option value="<?= $value['id'] ?>">
+                                <?= $value['nama'] ?> - <?= $value['alamat'] ?>
+                            </option>
+                        <?php } ?>
+                    </select>
                 </div>
 
-                <div class="section">
+                <div class="section mt-5">
                     <div class="store">
                         <div class="store-title">Decor Official Store</div>
                         <div>
-                            <?php foreach ($_SESSION['data_checkout'] as $key => $data) { ?>
+                            <?php foreach ($dataP as $key => $data) { ?>
                                 <div class="product">
                                     <img src="../../img/upload/<?= $data['gambar'] ?>">
                                     <div class="product-details">
                                         <p><?= $data['nama'] ?></p>
-                                        <span class="price"><?= $data['quantity'] ?> x Rp<?= number_format($data['harga'], 0, ',', '.') ?></span>
+                                        <span class="price"><?= $data['quantity'] ?> x Rp<?= number_format($data['harga'], 0, ',', '.') ?> = <?= number_format($data['quantity'] * $data['harga'], 0, ',', '.') ?></span>
                                     </div>
                                 </div>
                             <?php } ?>
                         </div>
                         <hr class="line">
+                        <div class="store-title">Shipping</div>
                         <div class="shipping">
                             <label class="flex gap-3">
-                                <input type="radio" name="shipping" checked>
+                                <input type="radio" name="shipping" value="cargo" required>
                                 <div>
                                     <p>Cargo</p>
                                     <p>Estimate Arrived 25-27 Jan</p>
@@ -110,7 +146,7 @@ if (isset($_POST['btnCheckout']) && $_SESSION['checkout']) {
                         </div>
                         <div class="shipping">
                             <label class="flex gap-3">
-                                <input type="radio" name="shipping" checked>
+                                <input type="radio" name="shipping" value="economi">
                                 <div>
                                     <p>Economi</p>
                                     <p>Estimate Arrived 7 - 11 Jan</p>
@@ -119,18 +155,12 @@ if (isset($_POST['btnCheckout']) && $_SESSION['checkout']) {
                         </div>
                         <div class="shipping">
                             <label class="flex gap-3">
-                                <input type="radio" name="shipping" checked>
+                                <input type="radio" name="shipping" value="instan">
                                 <div>
                                     <p>Instan (Arrived at the same day)</p>
                                     <p>Arrived Today</p>
                                 </div>
                             </label>
-                        </div>
-
-                        <hr class="line">
-                        <br>
-                        <div class="insurance">
-                            <label><input type="checkbox" name="insurance"> Use Shipping Ansurance (Rp50.000)</label>
                         </div>
                     </div>
                 </div>
@@ -143,19 +173,19 @@ if (isset($_POST['btnCheckout']) && $_SESSION['checkout']) {
                             <p>Payment Method</p>
                         </div>
                         <label>
-                            <input type="radio" name="payment" checked>
+                            <input type="radio" name="payment" value="bca" required>
                             <img src="https://images.tokopedia.net/img/payment/icons/bca.png" alt="BCA">
                             <h1>BCA Virtual Account</h1>
                         </label>
                         <hr class="line">
                         <label>
-                            <input type="radio" name="payment" checked>
+                            <input type="radio" name="payment" value="gopay">
                             <img src="https://images.tokopedia.net/img/payment/icons/gopay.png" alt="Gopay">
                             <h1>Gopay</h1>
                         </label>
                         <hr class="line">
                         <label>
-                            <input type="radio" name="payment">
+                            <input type="radio" name="payment" value="cod">
                             <h1>COD (Cash On Delivery)</h1>
                         </label>
                         <hr class="line">
@@ -165,8 +195,8 @@ if (isset($_POST['btnCheckout']) && $_SESSION['checkout']) {
                 <div class="section">
                     <div class="summary">
                         <div class="summary-item">
-                            <span>Total Price (1 Item)</span>
-                            <span>Rp2.000.000</span>
+                            <span>Total Price (<?= $totalItem ?> Item)</span>
+                            <span>Rp<?= number_format($hargaTotal, 0, ',', '.') ?></span>
                         </div>
                         <div class="summary-item">
                             <span>Total Shipping Cost</span>
@@ -184,7 +214,7 @@ if (isset($_POST['btnCheckout']) && $_SESSION['checkout']) {
                 </div>
                 <div class="flex flex-col gap-2 mb-3">
                     <p>Kirim bukti pembayaran</p>
-                    <input type="file" name="foto">
+                    <input type="file" name="foto" required class="border border-gray-300 rounded px-2 py-2">
                 </div>
 
                 <input type="submit" class="mt-3 w-full text-white py-2 rounded-lg bg-[#B5733A]" value="Checkout" name="btnCheckout">

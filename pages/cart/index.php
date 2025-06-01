@@ -2,7 +2,7 @@
 include "../../config.php";
 session_start();
 
-$sql = "SELECT c.id, p.nama, p.gambar, p.harga, c.quantity, c.id_pesanan FROM cart c JOIN produk p ON c.id_produk = p.id JOIN user u ON c.id_user = u.id WHERE u.id = " . $_SESSION['id_user'];
+$sql = "SELECT c.id, f.nama, GROUP_CONCAT(DISTINCT g.gambar SEPARATOR ', ') as gambar, f.harga, c.quantity FROM cart c LEFT JOIN furniture f ON f.id = c.furniture_id join furniture_gambar g on f.gambar_utama = g.id join user u on u.id = c.user_id WHERE c.user_id = " . $_SESSION['id_user'] . " GROUP BY f.id, f.nama, f.harga";
 $result = mysqli_query($conn, $sql);
 
 if ($result) {
@@ -15,7 +15,7 @@ if ($result) {
     }
 }
 
-if (isset($_POST['btnCheckOut']) && $_POST['products']) {
+if (isset($_POST['btnCheckOut']) && isset($_POST['products'])) {
     $_SESSION['checkout'] = $_POST['products'];
     header("Location: ../checkout");
 }

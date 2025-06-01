@@ -3,7 +3,7 @@ include "../../config.php";
 session_start();
 
 $id = $_GET['id'];
-$sql = "SELECT f.nama, f.deskripsi, f.harga, IFNULL(ROUND(AVG(r.rate), 1), 0.0) AS rating, GROUP_CONCAT(DISTINCT t.nama SEPARATOR ', ') AS tag, GROUP_CONCAT(DISTINCT g.gambar SEPARATOR ', ') as gambar FROM furniture f join furniture_gambar g on f.id = g.furniture_id LEFT JOIN review_furniture rf ON f.id = rf.furniture_id LEFT JOIN review r ON rf.review_id = r.id LEFT JOIN furniture_tag ft ON f.id = ft.furniture_id LEFT JOIN tag t ON ft.tag_id = t.id WHERE f.id = $id GROUP BY f.id, f.nama, f.harga";
+$sql = "SELECT f.id, f.deskripsi, f.nama, f.harga, GROUP_CONCAT(DISTINCT g.gambar SEPARATOR ', ') as gambar, rating, GROUP_CONCAT(DISTINCT t.nama SEPARATOR ', ') AS tag, COUNT(DISTINCT r.id) as review FROM furniture f join furniture_gambar g on f.id = g.furniture_id LEFT JOIN review r ON f.id = r.furniture_id LEFT JOIN furniture_tag ft ON f.id = ft.furniture_id LEFT JOIN tag t ON ft.tag_id = t.id WHERE f.id = $id GROUP BY f.id, f.nama, f.harga";
 
 $result = mysqli_query($conn, $sql);
 
@@ -12,7 +12,7 @@ if ($result) {
 }
 
 if (isset($_POST['btnAddToCart'])) {
-	$sqlC = "INSERT INTO cart (id, id_produk, id_user, id_pesanan, quantity) VALUES (NULL, " . $_SESSION['product']['id'] . ", " . $_SESSION['id_user'] . ", NULL, " . $_POST['quantity'] . ")";
+	$sqlC = "INSERT INTO cart (id, user_id, furniture_id, quantity) VALUES (NULL, " . $_SESSION['id_user'] . ", $id, " . $_POST['quantity'] . ")";
 	$resultC = mysqli_query($conn, $sqlC);
 
 
@@ -22,6 +22,20 @@ if (isset($_POST['btnAddToCart'])) {
 }
 
 $_SESSION['product']['gambar'] = array_map('trim', explode(',', $_SESSION['product']['gambar']));
+$_SESSION['product']['tag'] = array_map('trim', explode(',', $_SESSION['product']['tag']));
+
+$userId = $_SESSION['id_user'];
+$sqlReview = "SELECT r.id, u.username, u.gambar, r.ulasan, r.rate, GROUP_CONCAT(rg.gambar SEPARATOR ', ') AS gambar FROM review r JOIN pesanan_item pi ON r.pesanan_item_id = pi.id JOIN pesanan p ON pi.pesanan_id = p.id JOIN user u ON p.user_id = u.id JOIN review_gambar rg ON r.id = rg.review_id WHERE u.id = $userId AND r.furniture_id = $id GROUP BY r.id;";
+$resultReview = mysqli_query($conn, $sqlReview);
+
+if ($resultReview) {
+	$reviews = mysqli_fetch_all($resultReview, MYSQLI_ASSOC);
+}
+
+$reviews = array_map(function ($review) {
+	$review['gambar'] = array_map('trim', explode(',', $review['gambar']));
+	return $review;
+}, $reviews);
 ?>
 
 <!DOCTYPE html>
@@ -61,9 +75,9 @@ $_SESSION['product']['gambar'] = array_map('trim', explode(',', $_SESSION['produ
 					<div class="main-img">
 						<img src="../../img/upload/<?= $_SESSION['product']['gambar'][0] ?>" id="mainImage" alt="" class="slide" style="width: 450px; height: 300px; object-fit: cover;">
 					</div>
-					<div class="thumbnail-container" style="display: flex; gap: 15px; margin-top: 10px; cursor: pointer;">
+					<div class="thumbnail-container max-w-[450px] overflow-auto" style="display: flex; gap: 15px; margin-top: 10px; cursor: pointer;">
 						<?php foreach ($_SESSION['product']['gambar'] as $key => $value) { ?>
-							<img src="../../img/upload/<?= $value ?>" class="thumbnail" alt="" class="slide" style="width: 80px; height: 80px; object-fit: cover; ">
+							<img src="../../img/upload/<?= $value ?>" class="thumbnail" alt="" class="slide" style="width: 80px; height: 80px; object-fit: cover;">
 						<?php } ?>
 					</div>
 				</div>
@@ -71,15 +85,22 @@ $_SESSION['product']['gambar'] = array_map('trim', explode(',', $_SESSION['produ
 					<div class="product">
 						<h3 class="title"><?= $_SESSION['product']['nama'] ?></h3>
 						<div class="sells">
-							<i class="fa-solid fa-star star"></i>
+							<img class="w-[15px] h-[15px]" src="../../img/star.png" alt="">
 							<p id="rating"><?= $_SESSION['product']['rating'] ?></p>
 							<p>|</p>
-							<p>32 reviews</p>
+							<p><?= $_SESSION['product']['review'] ?> reviews</p>
 						</div>
 					</div>
 					<div class="deskripsi">
 						<div class="prc1">
 							<h1 id="price">Rp.<?= number_format($_SESSION['product']['harga'], 0, ',', '.') ?></h1>
+						</div>
+						<div class="flex flex-wrap gap-2">
+							<?php foreach ($_SESSION['product']['tag'] as $tag) { ?>
+								<span class="bg-[#EFE7E2] text-[#B5733A] px-3 py-1 rounded-full text-sm transition">
+									<?= $tag ?>
+								</span>
+							<?php } ?>
 						</div>
 						<div class="detail1">
 							<p id="detail"><?= $_SESSION['product']['deskripsi'] ?></p>
@@ -128,6 +149,30 @@ $_SESSION['product']['gambar'] = array_map('trim', explode(',', $_SESSION['produ
 		</section>
 	</form>
 
+	<div class="mx-24 mb-24 flex flex-col gap-5">
+		<h1 class="text-2xl font-medium">Reviews</h1>
+		<?php foreach ($reviews as $data) { ?>
+			<div class="flex flex-col gap-2">
+				<hr class="mb-5">
+				<div class="flex items-center gap-2">
+					<img class="w-[50px] h-[50px] rounded-full" src="../../img/default_pp.png" alt="">
+					<div>
+						<p><?= $data['username'] ?></p>
+						<div class="flex items-center gap-2">
+							<img class="w-[20px] h-[20px]" src="../../img/star.png" alt="">
+							<p><?= $data['rate'] ?></p>
+						</div>
+					</div>
+				</div>
+				<p><?= $data['ulasan'] ?></p>
+				<div class="flex items-center gap-2">
+					<?php foreach ($data['gambar'] as $img) { ?>
+						<img class="w-[100px] h-[100px] object-cover rounded-lg" src="../../img/upload/<?= $img ?>" alt="">
+					<?php } ?>
+				</div>
+			</div>
+		<?php } ?>
+	</div>
 
 	<?php include "../../components/footer.php" ?>
 

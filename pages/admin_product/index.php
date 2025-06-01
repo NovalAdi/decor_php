@@ -33,7 +33,7 @@ session_start(); //menyimpan data login user serta mengakses variabel global
     <?php include "../../components/nav.php"; //untuk tampilan navbar agar konsisten di halaman admin 
     ?>
 
-    <section class="flex flex-col mt-24 mx-20">
+    <section class="flex flex-col my-24 mx-20">
         <style>
             .section-title {
                 margin-bottom: 20px;
@@ -61,7 +61,7 @@ session_start(); //menyimpan data login user serta mengakses variabel global
             </thead>
             <tbody>
                 <?php
-                $sql = "SELECT f.id, f.nama, f.deskripsi, f.stock, f.harga, g.gambar, IFNULL(ROUND(AVG(r.rate), 1), 0.0) AS rating FROM furniture f join furniture_gambar g on f.gambar_utama = g.id LEFT JOIN review_furniture rf ON f.id = rf.furniture_id LEFT JOIN review r ON rf.review_id = r.id LEFT JOIN furniture_tag ft ON f.id = ft.furniture_id GROUP BY f.id, f.nama, f.harga"; //memilih semua kolom tabel tabel produk
+                $sql = "SELECT f.id, f.nama, f.deskripsi, f.stock, f.harga, g.gambar, IFNULL(ROUND(AVG(r.rate), 1), 0.0) AS rating FROM furniture f join furniture_gambar g on f.gambar_utama = g.id LEFT JOIN pesanan_item pi ON f.id = pi.furniture_id LEFT JOIN pesanan p ON p.id = pi.pesanan_id LEFT JOIN review r ON pi.id = r.pesanan_item_id LEFT JOIN furniture_tag ft ON f.id = ft.furniture_id GROUP BY f.id, f.nama, f.harga;"; //memilih semua kolom tabel tabel produk
                 $result = mysqli_query($conn, $sql); //untuk melakukan checking apakah sql sudah berjalan atau belum 
                 while ($row = mysqli_fetch_assoc($result)) {
                     //menampilkan baris tabel untuk setiap produk , melooping sesuai panjang data base 
@@ -83,7 +83,7 @@ session_start(); //menyimpan data login user serta mengakses variabel global
         </table>
     </section>
 
-    <script src="../home/script.js"></script>
+    <?php include "../../components/footer.php" ?>
 </body>
 
 </html>

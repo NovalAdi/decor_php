@@ -1,9 +1,15 @@
 <?php
-include "../../config.php"; //untuk mengimpor file konfigurasi yang berisi koneksi ke database ($conn)
-session_start(); //menyimpan data login user serta mengakses variabel global
+include "../../config.php";
+session_start();
 
-$sql = "";
-
+$sql = "SELECT p.id, u.email, p.jenis_pengiriman, p.jenis_pembayaran, a.alamat, p.bukti_pembayaran, p.tgl_pesan, p.status, SUM(f.harga * pi.quantity) AS total_harga FROM pesanan p JOIN user u ON p.user_id = u.id JOIN user_alamat a ON p.alamat = a.id JOIN pesanan_item pi ON p.id = pi.pesanan_id JOIN furniture f ON pi.furniture_id = f.id GROUP BY p.id;";
+$result = mysqli_query($conn, $sql);
+if ($result) {
+    $pesanan = mysqli_fetch_all($result, MYSQLI_ASSOC);
+} else {
+    $pesanan = [];
+    $error = mysqli_error($conn);
+}
 ?>
 
 <!DOCTYPE html>
@@ -100,10 +106,9 @@ $sql = "";
 
 <body class="font-sans">
 
-    <?php include "../../components/nav.php"; //untuk tampilan navbar agar konsisten di halaman admin ?>
+    <?php include "../../components/nav.php"; ?>
 
-
-    <div class="activity-log">
+    <div class="activity-log my-24">
         <div class="activity-header">
             <h2>Kelola Pesanan</h2>
 
@@ -127,173 +132,47 @@ $sql = "";
         <table>
             <thead>
                 <tr>
-                    <th>Username</th>
-                    <th>Email Address</th>
+                    <th>Email Customer</th>
+                    <th>Alamat</th>
                     <th>Total Harga</th>
-                    <th>Metode Pembayaran</th>
+                    <th>Pembayaran</th>
                     <th>Pengiriman</th>
-                    <th>Catatan</th>
                     <th>Bukti Pembayaran</th>
-                    <th>Waktu Pembayaran</th>
+                    <th>Tanggal Pesan</th>
                     <th>Status</th>
-                    <th>Ubah status</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>username1</td>
-                    <td>abccompany@gmail.com</td>
-                    <td>Rp 50.000</td>
-                    <td>Cash On Delivery</td>
-                    <td>Pick Up</td>
-                    <td>Percepat pengiriman</td>
-                    <td><a href="#" class="text-blue-600 underline">lihat bukti</a></td>
-                    <td>2025-05-25</td>
-                    <td><span class="text-yellow-600 font-semibold">Pending</span></td>
-                    <td>
-                        <form action="ubah_status.php" method="POST">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <select name="status" class="border border-gray-400 rounded px-2 py-1 mb-2 w-full">
-                                    <option value="Pending" selected>Pending</option>
-                                    <option value="Diproses">Diproses</option>
-                                    <option value="Dikirim">Dikirim</option>
-                                    <option value="Selesai">Selesai</option>
-                                    <option value="Dibatalkan">Dibatalkan</option>
-                                </select>
-                            </div>
-                            <input type="hidden" name="order_id" value="123"> <!-- Ganti dengan ID pesanan -->
-                            <button type="submit" style="background-color: #B5733A;"
-                                class="text-white font-semibold py-1 px-3 rounded w-full hover:opacity-90">
-                                Update
-                            </button>
-
-                        </form>
-                    </td>
-                </tr>
-                <tr>
-                    <td>username1</td>
-                    <td>abccompany@gmail.com</td>
-                    <td>Rp 50.000</td>
-                    <td>Cash On Delivery</td>
-                    <td>Pick Up</td>
-                    <td>Percepat pengiriman</td>
-                    <td><a href="#" class="text-blue-600 underline">lihat bukti</a></td>
-                    <td>2025-05-25</td>
-                    <td><span class="text-yellow-600 font-semibold">Pending</span></td>
-                    <td>
-                        <form action="ubah_status.php" method="POST">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <select name="status" class="border border-gray-400 rounded px-2 py-1 mb-2 w-full">
-                                    <option value="Pending" selected>Pending</option>
-                                    <option value="Diproses">Diproses</option>
-                                    <option value="Dikirim">Dikirim</option>
-                                    <option value="Selesai">Selesai</option>
-                                    <option value="Dibatalkan">Dibatalkan</option>
-                                </select>
-                            </div>
-                            <input type="hidden" name="order_id" value="123"> <!-- Ganti dengan ID pesanan -->
-                            <button type="submit" style="background-color: #B5733A;"
-                                class="text-white font-semibold py-1 px-3 rounded w-full hover:opacity-90">
-                                Update
-                            </button>
-
-                        </form>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>username1</td>
-                    <td>abccompany@gmail.com</td>
-                    <td>Rp 50.000</td>
-                    <td>Cash On Delivery</td>
-                    <td>Pick Up</td>
-                    <td>Percepat pengiriman</td>
-                    <td><a href="#" class="text-blue-600 underline">lihat bukti</a></td>
-                    <td>2025-05-25</td>
-                    <td><span class="text-yellow-600 font-semibold">Pending</span></td>
-                    <td>
-                        <form action="ubah_status.php" method="POST">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <select name="status" class="border border-gray-400 rounded px-2 py-1 mb-2 w-full">
-                                    <option value="Pending" selected>Pending</option>
-                                    <option value="Diproses">Diproses</option>
-                                    <option value="Dikirim">Dikirim</option>
-                                    <option value="Selesai">Selesai</option>
-                                    <option value="Dibatalkan">Dibatalkan</option>
-                                </select>
-                            </div>
-                            <input type="hidden" name="order_id" value="123"> <!-- Ganti dengan ID pesanan -->
-                            <button type="submit" style="background-color: #B5733A;"
-                                class="text-white font-semibold py-1 px-3 rounded w-full hover:opacity-90">
-                                Update
-                            </button>
-
-                        </form>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>username1</td>
-                    <td>abccompany@gmail.com</td>
-                    <td>Rp 50.000</td>
-                    <td>Cash On Delivery</td>
-                    <td>Pick Up</td>
-                    <td>Percepat pengiriman</td>
-                    <td><a href="#" class="text-blue-600 underline">lihat bukti</a></td>
-                    <td>2025-05-25</td>
-                    <td><span class="text-yellow-600 font-semibold">Pending</span></td>
-                    <td>
-                        <form action="ubah_status.php" method="POST">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <select name="status" class="border border-gray-400 rounded px-2 py-1 mb-2 w-full">
-                                    <option value="Pending" selected>Pending</option>
-                                    <option value="Diproses">Diproses</option>
-                                    <option value="Dikirim">Dikirim</option>
-                                    <option value="Selesai">Selesai</option>
-                                    <option value="Dibatalkan">Dibatalkan</option>
-                                </select>
-                            </div>
-                            <input type="hidden" name="order_id" value="123"> <!-- Ganti dengan ID pesanan -->
-                            <button type="submit" style="background-color: #B5733A;"
-                                class="text-white font-semibold py-1 px-3 rounded w-full hover:opacity-90">
-                                Update
-                            </button>
-
-                        </form>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>username1</td>
-                    <td>abccompany@gmail.com</td>
-                    <td>Rp 50.000</td>
-                    <td>Cash On Delivery</td>
-                    <td>Pick Up</td>
-                    <td>Percepat pengiriman</td>
-                    <td><a href="#" class="text-blue-600 underline">lihat bukti</a></td>
-                    <td>2025-05-25</td>
-                    <td><span class="text-yellow-600 font-semibold">Pending</span></td>
-                    <td>
-                        <form action="ubah_status.php" method="POST">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <select name="status" class="border border-gray-400 rounded px-2 py-1 mb-2 w-full">
-                                    <option value="Pending" selected>Pending</option>
-                                    <option value="Diproses">Diproses</option>
-                                    <option value="Dikirim">Dikirim</option>
-                                    <option value="Selesai">Selesai</option>
-                                    <option value="Dibatalkan">Dibatalkan</option>
-                                </select>
-                            </div>
-                            <input type="hidden" name="order_id" value="123"> <!-- Ganti dengan ID pesanan -->
-                            <button type="submit" style="background-color: #B5733A;"
-                                class="text-white font-semibold py-1 px-3 rounded w-full hover:opacity-90">
-                                Update
-                            </button>
-
-                        </form>
-                    </td>
-                </tr>
+                <?php foreach ($pesanan as $data) { ?>
+                    <tr>
+                        <td><?= $data['email'] ?></td>
+                        <td><?= $data['alamat'] ?></td>
+                        <td>Rp.<?= number_format($data['total_harga'], 0, ',', '.') ?></td>
+                        <td><?= $data['jenis_pembayaran'] ?></td>
+                        <td><?= $data['jenis_pengiriman'] ?></td>
+                        <td><a href="../../img/upload/<?= $data['bukti_pembayaran'] ?>" download class="text-blue-600 underline">Download Bukti</a></td>
+                        <td><?= $data['tgl_pesan'] ?></td>
+                        <td>
+                            <form action="update_pesanan.php" method="POST">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <select name="status" class="border border-gray-400 rounded px-2 py-1 mb-2 w-full">
+                                        <option value="Dikemas" <?= $data['status'] == 'Dikemas' ? 'selected' : '' ?>>Dikemas</option>
+                                        <option value="Dikirim" <?= $data['status'] == 'Dikirim' ? 'selected' : '' ?>>Dikirim</option>
+                                        <option value="Sampai" <?= $data['status'] == 'Sampai' ? 'selected' : '' ?>>Sampai</option>
+                                    </select>
+                                </div>
+                                <input type="hidden" name="id_pesanan" value="<?= $data['id'] ?>">
+                                <button type="submit" name="btnUpdate" style="background-color: #B5733A;"
+                                    class="text-white font-semibold py-1 px-3 rounded w-full hover:opacity-90">
+                                    Update
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                <?php } ?>
             </tbody>
         </table>
     </div>
+
+    <?php include "../../components/footer.php" ?>
 </body>

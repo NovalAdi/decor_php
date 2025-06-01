@@ -85,8 +85,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php include "../../components/nav.php"; ?>
 
     <form method="post" enctype="multipart/form-data" class="flex flex-col px-24 my-32 gap-7">
+        <h1 class="text-2xl font-semibold">Add produk</h1>
         <div>
-            <h1 class="text-2xl font-semibold mb-4">Image</h1>
+            <h1 class="text-xl font-semibold mb-4">Image</h1>
             <div class="flex items-center gap-4">
                 <label id="drop-zone"
                     class="w-48 h-48 p-5 flex flex-col items-center justify-center border-2 border-dashed border-gray-500 rounded-lg text-center text-gray-500 transition duration-300 ease-in-out hover:border-blue-500 hover:text-blue-500">
@@ -98,32 +99,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
         <div>
-            <h1 class="text-2xl font-semibold mb-4">Product Name</h1>
+            <h1 class="text-xl font-semibold mb-4">Product Name</h1>
             <input type="text" name="nama" placeholder="Enter product name"
                 class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
         </div>
         <div>
-            <h1 class="text-2xl font-semibold mb-4">Price</h1>
+            <h1 class="text-xl font-semibold mb-4">Price</h1>
             <input type="text" id="harga" name="harga" placeholder="Enter product price"
                 class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
 
         </div>
 
         <div>
-            <h1 class="text-2xl font-semibold mb-4">Description</h1>
+            <h1 class="text-xl font-semibold mb-4">Description</h1>
             <textarea id="description" name="deskripsi" placeholder="Enter product description"
                 class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 h-48 resize-none leading-relaxed" required></textarea>
         </div>
 
         <div>
-            <h1 class="text-2xl font-semibold mb-4">Tags</h1>
+            <h1 class="text-xl font-semibold mb-4">Tags</h1>
             <div class="flex flex-wrap gap-2">
                 <span id="add_tag" class="cursor-pointer border border-2 border-dashed border-[#B5733A] text-[#B5733A] px-3 py-1 rounded-full text-sm">Add Tags +</span>
             </div>
         </div>
 
         <div>
-            <h1 class="text-2xl font-semibold mb-4">Stock</h1>
+            <h1 class="text-xl font-semibold mb-4">Stock</h1>
             <input type="number" name="stock" placeholder="Enter product stock"
                 class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
         </div>

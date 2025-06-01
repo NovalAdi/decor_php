@@ -2,7 +2,7 @@
 include "../../config.php";
 session_start();
 
-$sql = "SELECT f.id, f.nama, f.harga, g.gambar, IFNULL(ROUND(AVG(r.rate), 1), 0.0) AS rating, GROUP_CONCAT(DISTINCT t.nama SEPARATOR ', ') AS tag FROM furniture f join furniture_gambar g on f.gambar_utama = g.id LEFT JOIN review_furniture rf ON f.id = rf.furniture_id LEFT JOIN review r ON rf.review_id = r.id LEFT JOIN furniture_tag ft ON f.id = ft.furniture_id LEFT JOIN tag t ON ft.tag_id = t.id ";
+$sql = "SELECT f.id, f.nama, f.harga, g.gambar, rating, GROUP_CONCAT(DISTINCT t.nama SEPARATOR ', ') AS tag, COUNT(r.id) as review FROM furniture f LEFT JOIN review r ON f.id = r.furniture_id join furniture_gambar g on f.gambar_utama = g.id LEFT JOIN furniture_tag ft ON f.id = ft.furniture_id LEFT JOIN tag t ON ft.tag_id = t.id ";
 
 $conditions = [];
 $having = "";
@@ -86,9 +86,11 @@ $rowTag = mysqli_fetch_all($resultTag, MYSQLI_ASSOC);
 
 $_SESSION['products'] = empty($row) ? [] : $row;
 for ($i = 0; $i < 50; $i++) {
-    $_SESSION['products'][] = $rows[0];
+    $_SESSION['products'][] = [];
 }
 $_SESSION['tags'] = empty($rowTag) ? [] : $rowTag;
+
+$dataPerPage = 20;
 
 ?>
 <!DOCTYPE html>
@@ -120,79 +122,77 @@ $_SESSION['tags'] = empty($rowTag) ? [] : $rowTag;
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 </head>
 
-<body class="font-sans">
+<body class="font-sans bg-gray-100">
 
     <?php include "../../components/nav.php"; ?>
 
-    <section class="grid grid-cols-4 pb-20 pt-10 mt-20">
+    <section class="grid grid-cols-4 py-3 mt-20">
         <!-- filter -->
-        <aside class="flex flex-col py-10 px-6 gap-3 drop-shadow-md bg-white ml-14 mr-7 rounded-xl border border-[1px] border-gray-200 h-min">
-            <form method="post">
-                <h1 class="text-2xl font-medium mb-2">Filter</h1>
-                <!-- tags -->
-                <div>
-                    <h1 class="font-medium">Tags</h1>
-                    <div class="ml-2 text-gray-700 mt-3 flex flex-wrap gap-y-3 gap-x-2">
-                        <?php
-                        foreach ($_SESSION['tags'] as $tag) {
-                            $checked = isset($_SESSION['tag_filter']) && in_array($tag['nama'], $_SESSION['tag_filter']) ? 'checked' : '';
-                        ?>
-                            <label class="cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    name="tags[]"
-                                    value="<?= $tag['nama'] ?>"
-                                    <?= $checked ?>
-                                    class="peer hidden" />
-                                <span class="peer-checked:bg-[#B5733A] peer-checked:text-white bg-[#EFE7E2] text-[#B5733A] hover:bg-[#e9d7cc] px-3 py-1 rounded-full text-sm transition">
-                                    <?= $tag['nama'] ?>
-                                </span>
-                            </label>
+        <form method="post" class="flex flex-col py-10 px-6 gap-3 drop-shadow-md bg-white ml-14 mr-7 rounded-xl border border-[1px] border-gray-200 h-min">
+            <h1 class="text-2xl font-medium mb-2">Filter</h1>
+            <!-- tags -->
+            <div>
+                <h1 class="font-medium">Tags</h1>
+                <div class="ml-2 text-gray-700 mt-3 flex flex-wrap gap-y-3 gap-x-2">
+                    <?php
+                    foreach ($_SESSION['tags'] as $tag) {
+                        $checked = isset($_SESSION['tag_filter']) && in_array($tag['nama'], $_SESSION['tag_filter']) ? 'checked' : '';
+                    ?>
+                        <label class="cursor-pointer">
+                            <input
+                                type="checkbox"
+                                name="tags[]"
+                                value="<?= $tag['nama'] ?>"
+                                <?= $checked ?>
+                                class="peer hidden" />
+                            <span class="peer-checked:bg-[#B5733A] peer-checked:text-white bg-[#EFE7E2] text-[#B5733A] hover:bg-[#e9d7cc] px-3 py-1 rounded-full text-sm transition">
+                                <?= $tag['nama'] ?>
+                            </span>
+                        </label>
 
-                        <?php } ?>
-                    </div>
+                    <?php } ?>
                 </div>
-                <!-- rating  -->
-                <div class="mt-3">
-                    <h1 class="font-medium">Rating</h1>
-                    <div class="ml-2 text-gray-700 mt-3 flex flex-col gap-1">
-                        <?php
-                        $ratings = [5, 4, 3, 2, 1];
-                        foreach ($ratings as $rating) {
-                            // Periksa jika rating ada di filter yang disimpan di session
-                            $checked = (isset($_SESSION['rating_filter']) && in_array($rating, $_SESSION['rating_filter'])) ? 'checked' : '';
-                        ?>
-                            <div class="flex gap-3 items-center">
-                                <input type="checkbox" name="ratings[]" value="<?= $rating ?>" <?= $checked ?>>
-                                <div class="flex gap-1 items-center">
-                                    <?php for ($i = 0; $i < $rating; $i++) { ?>
-                                        <img class="w-[15px] h-[15px]" src="../../img/star.png" alt="">
-                                    <?php } ?>
-                                    <p>(<?= $rating ?>)</p>
-                                </div>
+            </div>
+            <!-- rating  -->
+            <div class="mt-3">
+                <h1 class="font-medium">Rating</h1>
+                <div class="ml-2 text-gray-700 mt-3 flex flex-col gap-1">
+                    <?php
+                    $ratings = [5, 4, 3, 2, 1];
+                    foreach ($ratings as $rating) {
+                        // Periksa jika rating ada di filter yang disimpan di session
+                        $checked = (isset($_SESSION['rating_filter']) && in_array($rating, $_SESSION['rating_filter'])) ? 'checked' : '';
+                    ?>
+                        <label class="flex gap-3 items-center">
+                            <input type="checkbox" name="ratings[]" value="<?= $rating ?>" <?= $checked ?>>
+                            <div class="flex gap-1 items-center">
+                                <?php for ($i = 0; $i < $rating; $i++) { ?>
+                                    <img class="w-[15px] h-[15px]" src="../../img/star.png" alt="">
+                                <?php } ?>
+                                <p>(<?= $rating ?>)</p>
                             </div>
-                        <?php } ?>
-                    </div>
+                        </label>
+                    <?php } ?>
                 </div>
-                <!-- price  -->
-                <div class="flex flex-col gap-3 mt-3">
-                    <h1 class="font-medium">Filter by Price</h1>
-                    <div class="flex">
-                        <p class="flex items-center border-l-[1.5px] border-y-[1.5px] border-gray-400 rounded-l-lg px-2">Rp</p>
-                        <input type="text" name="price_from" placeholder="From"
-                            class="p-2 border border-[1.5px] border-gray-400 rounded-r-lg text-sm w-full"
-                            value="<?= isset($_SESSION['price_from']) ? $_SESSION['price_from'] : '' ?>">
-                    </div>
-                    <div class="flex">
-                        <p class="flex items-center border-l-[1.5px] border-y-[1.5px] border-gray-400 rounded-l-lg px-2">Rp</p>
-                        <input type="text" name="price_to" placeholder="To"
-                            class="p-2 border border-[1.5px] border-gray-400 rounded-r-lg text-sm w-full"
-                            value="<?= isset($_SESSION['price_to']) ? $_SESSION['price_to'] : '' ?>">
-                    </div>
+            </div>
+            <!-- price  -->
+            <div class="flex flex-col gap-3 mt-3">
+                <h1 class="font-medium">Filter by Price</h1>
+                <div class="flex">
+                    <p class="flex items-center border-l-[1.5px] border-y-[1.5px] border-gray-400 rounded-l-lg px-2">Rp</p>
+                    <input type="text" name="price_from" placeholder="From"
+                        class="p-2 border border-[1.5px] border-gray-400 rounded-r-lg text-sm w-full"
+                        value="<?= isset($_SESSION['price_from']) ? $_SESSION['price_from'] : '' ?>">
                 </div>
-                <input type="submit" name="btnFilter" class="mt-3 w-full text-white py-2 rounded-lg bg-[#B5733A]" value="Apply Filter">
-            </form>
-        </aside>
+                <div class="flex">
+                    <p class="flex items-center border-l-[1.5px] border-y-[1.5px] border-gray-400 rounded-l-lg px-2">Rp</p>
+                    <input type="text" name="price_to" placeholder="To"
+                        class="p-2 border border-[1.5px] border-gray-400 rounded-r-lg text-sm w-full"
+                        value="<?= isset($_SESSION['price_to']) ? $_SESSION['price_to'] : '' ?>">
+                </div>
+            </div>
+            <input type="submit" name="btnFilter" class="mt-3 w-full text-white py-2 rounded-lg bg-[#B5733A]" value="Apply Filter">
+        </form>
 
         <main class="col-span-3 mr-14">
 
@@ -217,14 +217,14 @@ $_SESSION['tags'] = empty($rowTag) ? [] : $rowTag;
                 <?php
                 foreach ($_SESSION['products'] as $key => $product) {
                     $list = isset($_GET['list']) ? $_GET['list'] : 1;
-                    if ($list != 1 && $key < ($list - 1) * 12) {
+                    if ($list != 1 && $key < ($list - 1) * $dataPerPage) {
                         continue;
-                    } elseif ($list != 1 && $key >= $list * 12) {
+                    } elseif ($list != 1 && $key >= $list * $dataPerPage) {
                         continue;
-                    } elseif ($list == 1 && $key >= 12) {
+                    } elseif ($list == 1 && $key >= $dataPerPage) {
                         break;
                     } ?>
-                    <a class="bg-white hover:bg-gray-50 overflow-hidden flex flex-col gap-3 rounded-lg" href="../detail-product2/?id=<?= $product['id'] ?>">
+                    <a class="pb-1 bg-white hover:bg-gray-50 overflow-hidden flex flex-col gap-3 rounded-lg" href="../detail-product2/?id=<?= $product['id'] ?>">
                         <div class="relative">
                             <img class="bg-gray-200 h-[250px] object-cover" src="../../img/upload/<?= $product['gambar'] ?>" alt="">
                         </div>
@@ -235,7 +235,7 @@ $_SESSION['tags'] = empty($rowTag) ? [] : $rowTag;
                             </div>
                             <div class="flex gap-2 items-center">
                                 <img class="w-[15px] h-[15px]" src="../../img/star.png" alt="">
-                                <p class=""><?= $product['rating'] ?> | 42 reviews</p>
+                                <p class=""><?= $product['rating'] ?> | <?= $product['review'] ?> reviews</p>
                             </div>
                         </div>
                     </a>
@@ -250,7 +250,7 @@ $_SESSION['tags'] = empty($rowTag) ? [] : $rowTag;
                 </div>
                 <div class="flex gap-3">
                     <?php
-                    $page = count($_SESSION['products']) % 12 == 0 ? count($_SESSION['products']) / 12 : floor(count($_SESSION['products']) / 12 + 1);
+                    $page = count($_SESSION['products']) % $dataPerPage == 0 ? count($_SESSION['products']) / $dataPerPage : floor(count($_SESSION['products']) / $dataPerPage + 1);
                     for ($i = 1; $i <= $page; $i++) {
                         $active = (isset($_GET['list']) && $_GET['list'] == $i) ? 'active' : '';
                         if ($active == 'active' || (!isset($_GET['list']) && $i == 1)) { ?>
@@ -261,8 +261,8 @@ $_SESSION['tags'] = empty($rowTag) ? [] : $rowTag;
                     } ?>
                 </div>
                 <div class="flex gap-5">
-                    <a href="?list=<?= isset($_GET['list']) && $_GET['list'] < floor(count($_SESSION['products']) / 12 + 1) ? $_GET['list'] + 1 : floor(count($_SESSION['products']) / 12 + 1) ?>"><i class="fa-solid fa-angle-right"></i></a>
-                    <a href="?list=<?= floor(count($_SESSION['products']) / 12 + 1) ?>"><i class="fa-solid fa-angles-right"></i></a>
+                    <a href="?list=<?= isset($_GET['list']) && $_GET['list'] < floor(count($_SESSION['products']) / $dataPerPage + 1) ? $_GET['list'] + 1 : floor(count($_SESSION['products']) / $dataPerPage + 1) ?>"><i class="fa-solid fa-angle-right"></i></a>
+                    <a href="?list=<?= floor(count($_SESSION['products']) / $dataPerPage + 1) ?>"><i class="fa-solid fa-angles-right"></i></a>
                 </div>
             </div>
         </main>
